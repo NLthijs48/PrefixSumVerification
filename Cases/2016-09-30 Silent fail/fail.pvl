@@ -1,0 +1,91 @@
+// running with: ./unix/bin/vct ../VerCorsSpec/spec.pvl --silver=silicon --single-group --progress --detail
+
+class Ref {
+	// Requires/Ensures for complete kernel
+	invariant N==16 && H==6;
+	invariant temp != null;
+	requires (\forall* int i; 0<=i && i<N*2;
+				(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+			 );
+
+	// Kernel method
+	void runKernel(int N, int H, int[H][N*2] temp) {
+
+		// Define threads
+		par runThreads (int t=0..N)
+			requires Perm(temp[0][t*2], write);
+			requires Perm(temp[0][t*2+1], write);
+			requires (\forall* int k; 0<=k && k<2;
+   				(\forall* int i; 1<=i && i<H; Perm(temp[i][k*N+t], write))
+   			);
+
+		// Thread code
+		{
+
+			// Remaining steps of the upsweep phase
+			int level=1;
+			loop_invariant level>=1 && level<H;
+			loop_invariant t>=0 && t<N;
+			// Old permisison layout going away (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; level<=i && i<H; Perm(temp[i][k*N+t], write))
+			);
+			while((level+1)<H) {
+				level = level+1;
+				barrier(runThreads) {
+					context level>=1 && level<H;
+					context t>=0 && t<N;
+					requires (\forall* int k; 0<=k && k<2; Perm(temp[level-1][k*N+t], write)); // Combined alternative, ends with Fail without explanation
+					//requires Perm(temp[level-1][t], write);
+					//requires Perm(temp[level-1][t+N], write);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

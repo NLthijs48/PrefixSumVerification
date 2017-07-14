@@ -1,0 +1,78 @@
+// -*- tab-width:4 ; indent-tabs-mode:nil -*-
+// running with: vercors/unix/bin/vct SPEC/cSpecLatest.pvl --silver=silicon --single-group
+
+class Ref {
+	// Requires/Ensures for complete kernel
+	requires N==32 && H==6 && M==16;
+	requires (\forall* int i; 0<=i && i<N;
+				(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+			 );
+
+	// Kernel method
+	void test(int N, int H, int M, int[H][N] temp) {
+
+		// Define threads
+		par tst (int t=0..M;;true)
+			requires N==32 && H==6 && M==16;
+
+			//////// Option one
+			//requires (\forall* int i; 1<=i && i<H; Perm(temp[i][t], write));
+			//requires (\forall* int i; 1<=i && i<H; Perm(temp[i][t+M], write)); // Error
+
+			//////// Option two
+			requires (\forall* int f; 0<=f && f<=1;
+				(\forall* int i; 1<=i && i<H; Perm(temp[i][t+f*M], write))
+			); // Error
+
+		// Thread code
+		{
+
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

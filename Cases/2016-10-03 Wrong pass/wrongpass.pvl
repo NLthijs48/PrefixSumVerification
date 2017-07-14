@@ -1,0 +1,76 @@
+// running with: ./unix/bin/vct ../VerCorsSpec/spec.pvl --silver=silicon --single-group --detail
+
+class Ref {
+
+	////////// KERNEL
+	invariant N==16 && H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant temp != null;
+	invariant input != null;
+	requires (\forall* int i; 0<=i && i<N*2; Perm(input[i], write));
+	requires (\forall* int i; 0<=i && i<N*2;
+		(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+	);
+	void runKernel(int N, int H, int[N*2] input, int[H][N*2] temp) {
+
+		////////// THREADS
+		par runThreads (int t=0..N)
+			requires Perm(input[t], write);
+			//requires Perm(input[t+N], write);
+			requires (\forall* int k; 0<=k && k<2;
+   				(\forall* int i; 0<=i && i<H; Perm(temp[i][k*N+t], write))
+   			);
+		{
+			////////// INPUT COPY
+			temp[0][t] = input[t];
+			//assert false; // FAIL if enabled
+			temp[0][t+N] = input[t+N]; // This line seems to do something weird that causes it to not look below
+			assert false; // PASS while enabled
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

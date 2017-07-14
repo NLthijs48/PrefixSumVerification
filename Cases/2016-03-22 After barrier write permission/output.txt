@@ -1,0 +1,39 @@
+thijs@thijs:~/Desktop$ vercors/unix/bin/vct SPEC/minimal.pvl --silver=silicon --single-group --detail
+Plain test
+Parsed 1 file(s) in: 232ms
+verifying with builtin silicon backend
+WARNING: Possible simplification failure: \forall* argument is not of the form Perm(S[i].v,e) or Value(S[i].v) in
+(\forall* int k;0 <= k && k < 2;Perm( temp [ ((level - 1) * N + (t * 2 + k)) ].Ref__Integer_value , write ))
+Backend AST conversion took 350 ms
+tool home is /home/thijs/Desktop/vercors/deps
+running verify
+finished verify
+Errors! (1)
+error (AssertFailed): [assert.failed:insufficient.permission] Assert might fail. There might be insufficient permission to access temp[Ref__multidim_index_2(H, N, level__1 - 1, t * 2)].Ref__Integer_value. (<no position>)
+offending node (Assert): assert (t < N \ 2) ==> acc(temp[Ref__multidim_index_2(H, N, level__1 - 1, t * 2)].Ref__Integer_value, write)
+reason (String): insufficient.permission
+=== SPEC/minimal.pvl               ===
+  54                     ensures t<(N/2) ==> (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+  55                 }
+                    [----------------------------------------------------
+  56                 assert(t<(N/2) ==> Perm(temp[level-1][t*2], write));   // Fails
+                     ----------------------------------------------------]
+  57                 assert(t<(N/2) ==> Perm(temp[level-1][t*2+1], write)); // Fails
+  58                 // Do next up-sweep step
+-----------------------------------------
+  assert.failed:insufficient.permission
+=========================================
+=== SPEC/minimal.pvl               ===
+  54                     ensures t<(N/2) ==> (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+  55                 }
+                                            [------------------
+  56                 assert(t<(N/2) ==> Perm(temp[level-1][t*2], write));   // Fails
+                                             ------------------]
+  57                 assert(t<(N/2) ==> Perm(temp[level-1][t*2+1], write)); // Fails
+  58                 // Do next up-sweep step
+-----------------------------------------
+  because of insufficient.permission
+=========================================
+verification took 2921 ms
+The final verdict is Fail
+entire run took 6606 ms

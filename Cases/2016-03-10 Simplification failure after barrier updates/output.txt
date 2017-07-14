@@ -1,0 +1,57 @@
+thijs@thijs:~/Desktop$ vercors/unix/bin/vct SPEC/cSpecLatest.pvl --silver=silicon --single-group
+Plain test
+Parsed 1 file(s) in: 255ms
+verifying with builtin silicon backend
+WARNING: Possible simplification failure: \forall* argument is not of the form Perm(S[i].v,e) or Value(S[i].v) in
+(\forall* int k;0 <= k && k < 2;Perm( temp [ ((level - 1) * N + (t * 2 + k)) ].Ref__Integer_value , write ))
+WARNING: Possible simplification failure: \forall* argument is not of the form Perm(S[i].v,e) or Value(S[i].v) in
+(\forall* int k;0 <= k && k < 2;Perm( temp [ (level * N + (t * 2 + k)) ].Ref__Integer_value , write ))
+Backend AST conversion took 365 ms
+tool home is /home/thijs/Desktop/vercors/deps
+running verify
+finished verify
+Errors! (1)
+=== SPEC/cSpecLatest.pvl           ===
+  65             while((level+1)<H) {
+  66                 level = level+1;
+                    [----------------
+  67                 barrier(local) {
+  68                     // This barrier changes permissions from this situation:
+  69                     // t1 | t2 | t3 | t4 | t5 | t6 | t7 | t8 ...
+  70                     // to the following situation:
+  71                     // t1 | t1 | t2 | t2 | t3 | t3 | t4 | t4 ...
+  72                     // for levels 0 to (H-2), top row keeps the old layout
+  73                     // (t1 means thread 1 has permission for that slot)
+  74 
+  75                     requires N==32 && H==6;
+  76                     requires level>=1 && level<H;
+  77                     requires t>=0 && t<N;
+  78                     requires Perm(temp[level-1][t], write);
+  79                     requires temp != null;
+  80 
+  81                     ensures N==32 && H==6;
+  82                     ensures level>=1 && level<H;
+  83                     ensures t>=0 && t<N;
+  84                     ensures t<(N/2) ==> (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+  85                     ensures temp != null;
+  86                 }
+     -----------------]
+  87                 // Do next up-sweep step
+  88                 if(t < (N/2)) {
+-----------------------------------------
+  call.precondition:assertion.false
+=========================================
+=== SPEC/cSpecLatest.pvl           ===
+  77                     requires t>=0 && t<N;
+  78                     requires Perm(temp[level-1][t], write);
+                                 [------------
+  79                     requires temp != null;
+                                  ------------]
+  80 
+  81                     ensures N==32 && H==6;
+-----------------------------------------
+  because of assertion.false
+=========================================
+verification took 4135 ms
+The final verdict is Fail
+entire run took 7945 ms

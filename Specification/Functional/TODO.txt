@@ -1,0 +1,4 @@
+- Check if first upsweep and first downsweep cases can be included in the loops
+
+NOTES:
+- loop_invariants for permissions are the same for both while loops

@@ -1,0 +1,153 @@
+// running with: ./unix/bin/vct ../VerCorsSpec/spec.pvl --silver=silicon --single-group --progress --detail
+
+class Ref {
+
+	////////// KERNEL
+	invariant N==16 && H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant \matrix(temp,H,N*2);
+	invariant \array(input,N*2);
+	invariant \array(output,N*2);
+	context (\forall* int i; 0<=i && i<N*2; Perm(input[i], 1/2));
+	context (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
+	context (\forall* int i; 0<=i && i<N*2;
+		(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+	);
+	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] temp) {
+
+		////////// THREADS
+		par runThreads (int t=0..N)
+			context Perm(input[t*2], 1/10);
+			context Perm(input[t*2+1], 1/10);
+			context Perm(output[t*2], write);
+			context Perm(output[t*2+1], write);
+			context Perm(temp[0][t*2], write);
+			context Perm(temp[0][t*2+1], write);
+			context (\forall* int k; 0<=k && k<2;
+   				(\forall* int i; 1<=i && i<H; Perm(temp[i][k*N+t], write))
+   			);
+		{
+			////////// INPUT COPY
+			temp[0][t*2]   = input[t*2];
+			temp[0][t*2+1] = input[t*2+1];
+
+
+			////////// UPSWEEP
+			temp[1][t] = temp[0][t*2] + temp[0][t*2+1];
+
+			// Remaining steps of the upsweep phase
+			int level=1;
+			loop_invariant level>=1 && level<H;
+			loop_invariant t>=0 && t<N;
+			// Old permisison layout going away, top row excluded: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; level<=i && i<H; Perm(temp[i][k*N+t], write))
+			);
+			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+k], write))
+			);
+			while((level+1)<H) {
+				level = level+1;
+				barrier(runThreads) {
+					context level>=1 && level<H;
+					context t>=0 && t<N;
+
+					//requires (\forall* int k; 0<=k && k<2; Perm(temp[level-1][k*N+t], write)); // Combined alternative, ends with Fail without explanation
+					requires Perm(temp[level-1][t], write);
+					requires Perm(temp[level-1][t+N], write);
+
+					ensures (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+				}
+				temp[level][t] = temp[level-1][t*2] + temp[level-1][t*2+1]; // Had t*2+id(0) and t*2+id(1), looks like that is not necessary anymore
+			}
+
+
+			////////// DOWNSWEEP
+			// Set the root to zero, preparation for down-sweep
+			temp[H-1][t] = 0;
+
+			if(level-1>0) { // Level is 5 here (H-1)
+				temp[level-1][t*2+1] = temp[level-1][t*2] + temp[level][t];     // Right child
+				temp[level-1][t*2] = temp[level][t];                            // Left child
+			}
+
+			loop_invariant level>=1 && level<H;
+			loop_invariant t>=0 && t<N;
+			// Old permisison layout coming back, top row already has it: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; level<=i && i<H; Perm(temp[i][k*N+t], write))
+			);
+			// New permission layout going away, bottom row exluded: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+k], write))
+			);
+			while((level-1)>0) {
+				level = level-1;
+				barrier(runThreads) {
+					context t>=0 && t<N;
+					context level>=1 && level<H;
+
+					requires Perm(temp[level][t*2], write);
+					requires Perm(temp[level][t*2+1], write);
+
+					ensures Perm(temp[level][t], write);
+					ensures Perm(temp[level][t+N], write);
+				}
+				// Do next down-sweep step
+				temp[level-1][t*2+1] = temp[level-1][t*2] + temp[level][t];     // Right child
+				temp[level-1][t*2] = temp[level][t];                            // Left child
+			}
+
+
+			////////// OUTPUT COPY
+			output[t*2] = temp[0][t*2];
+			output[t*2+1] = temp[0][t*2+1];
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

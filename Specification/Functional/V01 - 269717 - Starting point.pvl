@@ -1,0 +1,196 @@
+// running with: ./VerCors/unix/bin/vct VerCorsSpec/spec.pvl --silver=silicon --single-group --progress --detail
+
+class Ref {
+	// Requires/Ensures for complete kernel
+	requires N==32 && H==6;
+	requires temp != null;
+	requires (\forall* int i; 0<=i && i<N; Perm(input[i], read));
+	requires (\forall* int i; 0<=i && i<N; Perm(output[i], write));
+	requires (\forall* int i; 0<=i && i<N;
+				(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+			 );
+
+	ensures N==32 && H==6;
+	ensures temp != null;
+	ensures (\forall* int i; 0<=i && i<N; Perm(input[i], read));
+	ensures (\forall* int i; 0<=i && i<N; Perm(output[i], write));
+	ensures (\forall* int i; 0<=i && i<N;
+				(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+			 );
+
+	// Kernel method
+	void test(int N, int H, int[N] input, int[N] output, int[H][N] temp) {
+
+		// Define threads
+		par tst (int t=0..N/2)
+			requires N==32 && H==6;
+			requires temp != null;
+			requires Perm(input[t*2], read);
+			requires Perm(input[t*2+1], read);
+			requires Perm(output[t*2], write);
+			requires Perm(output[t*2+1], write);
+			requires Perm(temp[0][t*2], write);
+			requires Perm(temp[0][t*2+1], write);
+			requires (\forall* int i; 1<=i && i<H; Perm(temp[i][t], write));
+
+			ensures N==32 && H==6;
+			ensures Perm(input[t*2], read);
+			ensures Perm(input[t*2+1], read);
+			ensures Perm(output[t*2], write);
+			ensures Perm(output[t*2+1], write);
+			ensures Perm(temp[0][t*2], write);
+			ensures Perm(temp[0][t*2+1], write);
+			ensures (\forall* int i; 1<=i && i<H; Perm(temp[i][t], write));
+
+		// Thread code
+		{
+			// Input copy
+			temp[0][t*2]   = input[t*2];
+			temp[0][t*2+1] = input[t*2+1];
+			// First step of up-sweep
+			temp[1][t] = temp[0][t*2] + temp[0][t*2+1];
+
+			// Remaining steps of the upsweep phase
+			int level=1;
+			loop_invariant N==32 && H==6;
+			loop_invariant temp != null;
+			loop_invariant level>=1 && level<H;
+			loop_invariant t>=0 && t<N;
+			loop_invariant (\forall* int i; level<=i && i<H; Perm(temp[i][t], write));
+			loop_invariant (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2], write));
+			loop_invariant (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+1], write));
+			while((level+1)<H) {
+				level = level+1;
+				assert Perm(temp[level-1][t], write);
+				barrier(tst) {
+					// This barrier changes permissions from this situation:
+					// t1 | t2 | t3 | t4 | t5 | t6 | t7 | t8 ...
+					// to the following situation:
+					// t1 | t1 | t2 | t2 | t3 | t3 | t4 | t4 ...
+					// for levels 0 to (H-2), top row keeps the old layout
+					// (t1 means thread 1 has permission for that slot)
+
+					requires temp != null;
+					requires N==32 && H==6;
+					requires level>=1 && level<H;
+					requires t>=0 && t<N;
+					requires Perm(temp[level-1][t], write);
+
+					ensures temp != null;
+					ensures N==32 && H==6;
+					ensures level>=1 && level<H;
+					ensures t>=0 && t<N;
+					ensures (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+				}
+				// Do next up-sweep step
+				assert temp != null;
+				assert N==32 && H==6;
+				assert level>=1 && level<H;
+				assert t>=0 && t<N;
+				assert  (\forall* int k; 0<=k && k<2; Perm(temp[level-1][t*2+k], write));
+				temp[level][t] = temp[level-1][t*2+id(0)] + temp[level-1][t*2+id(1)];
+			}
+
+			// Set the root to zero, preparation for down-sweep
+			temp[H-1][t] = 0;
+
+			// Level is 5 here (H-1)
+			if(level-1>0) {
+				// First step of downsweep
+				temp[level-1][t*2+1] = temp[level-1][t*2] + temp[level][t];     // Right child
+				temp[level-1][t*2] = temp[level][t];                            // Left child
+			}
+
+			// Remaining steps of the downsweep
+			loop_invariant N==32 && H==6;
+			loop_invariant level>=1 && level<H;
+			loop_invariant t>=0 && t<N;
+			loop_invariant temp != null;
+			loop_invariant (\forall* int i; level<=i && i<H; Perm(temp[i][t], write));
+			loop_invariant (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2], write));
+			loop_invariant (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+1], write));
+			while((level-1)>0) {
+				level = level-1;
+				assert Perm(temp[level][t*2+id(0)], write);
+				assert Perm(temp[level][t*2+id(1)], write);
+				barrier(tst) {
+					// This barrier changes permissions from this situation:
+					// t1 | t1 | t2 | t2 | t3 | t3 | t4 | t4 ...
+					// to the following situation:
+					// t1 | t2 | t3 | t4 | t5 | t6 | t7 | t8 ...
+					// for levels 1 to (H-2), top and bottom rows keep the old layout
+					// (t1 means thread 1 has permission for that slot)
+
+					requires N==32 && H==6;
+					requires t>=0 && t<N;
+					requires level>=1 && level<H;
+					requires (\forall* int k; 0<=k && k<2; Perm(temp[level][t*2+k], write));
+					requires temp != null;
+
+					ensures N==32 && H==6;
+					ensures level>=1 && level<H;
+					ensures t>=0 && t<N;
+					ensures Perm(temp[level][t], write);
+					ensures temp != null;
+				}
+				// Do next down-sweep step
+				assert temp != null;
+				assert N==32 && H==6;
+				assert level>=1 && level<H;
+				assert t>=0 && t<N;
+				assert Perm(temp[level][t], write);
+				temp[level-1][t*2+1] = temp[level-1][t*2] + temp[level][t];     // Right child
+				temp[level-1][t*2] = temp[level][t];                            // Left child
+			}
+			// Copy the result from the tree to the output array
+			output[t*2] = temp[0][t*2];
+			output[t*2+1] = temp[0][t*2+1];
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
