@@ -1,0 +1,199 @@
+% !TeX spellcheck = en_US
+
+\documentclass[a4paper]{article}
+\usepackage[utf8x]{inputenc}	% Use UTF8 characters
+\usepackage[hyphens]{url}	% Proper url in the references section
+\usepackage{relsize}		% Provide \mathlarger to get formula's to the correct size
+\usepackage{hyperref}		% Clickable urls and references ("\pdfendlink ended up in different nesting level than \pdfstartlink"? add [draft])
+\usepackage{enumitem}		% Numbered items, enumerate customizers
+\usepackage{graphicx}		% Images
+\usepackage{tabularx}		% Tables
+\usepackage{needspace}		% Prevent sections starting when low on space
+\usepackage{placeins}		% \FloatBarrier
+\usepackage{longtable}		% Multi-page tables
+\usepackage[nottoc,numbib]{tocbibind} % Add reference to the table of contents (and give it a chapter number)
+
+\emergencystretch=10pt		% Allow more stretching whitespace to prevent overfull/underfilled lines.
+
+% TODO: use \Needspace{5\baselineskip} before sections (redefine sections?)
+\usepackage[usenames, dvipsnames]{color}
+\usepackage[toc,page]{appendix}
+\definecolor{inline}{rgb}{0,0,0.5}
+\pagenumbering{arabic}		% Page numbering
+\setlist{itemsep=0pt, topsep=2pt} % Smaller spacing between items
+% \overlap for week numbers that are used twice
+\definecolor{overlap}{gray}{0.5}
+\newcommand{\overlap}[1]{\textcolor{overlap}{#1}}
+
+\newcommand{\sectionbreak}{\clearpage} % Newpage before starting new section
+
+% Setup section header spacing
+\usepackage{titlesec}
+\titlespacing*{\section}
+	{0pt}{0.7cm}{0cm}
+\titlespacing*{\subsection}
+	{0pt}{0.7cm minus 0.4cm}{0cm}
+\titlespacing*{\subsubsection}
+	{0pt}{0.4cm minus 0.2cm}{0cm}
+
+% Setup captions styling
+\usepackage{caption}
+\captionsetup[figure]{format=plain, singlelinecheck=false, margin=0pt, font={bf,footnotesize}, justification=centering, aboveskip=3pt}
+\captionsetup[table]{format=plain, singlelinecheck=false, margin=0pt, font={bf,footnotesize}, justification=centering, aboveskip=3pt}
+\captionsetup[lstlisting]{format=plain, singlelinecheck=false, margin=0pt, font={bf,footnotesize}, justification=centering, aboveskip=3pt}
+
+% Setup todo note command
+\marginparsep 11pt
+\marginparwidth 1.4cm
+\usepackage{setspace}	% \setstretch
+\newcommand{\todo}[1]{{\color{BurntOrange}\sffamily\textbf{todo: #1}\par}}
+
+\setlength{\parindent}{0em} % No indenting for new paragraphs
+\setlength{\parskip}{0.5em} % Empty line between paragraphs
+
+% Spacing of tableofcontents
+\usepackage{tocloft}
+\renewcommand\cftsecafterpnum{\vskip0pt}
+
+% Code listings
+%===== Code snippet styling =====
+\newcommand{\code}[1]{\texttt{\small \color{inline}#1}} % \code command for inline snippets
+\usepackage{listings}		% Code snippets
+\usepackage{color}			% Code highlighting colors
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{inline}{rgb}{0,0,0.5}
+\definecolor{gray}{gray}{0.2}
+\definecolor{codeText}{rgb}{0.1,0.1,0.1}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+	framerule=0.2pt,
+	language=Java,
+	aboveskip=2mm,
+	belowskip=5mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily\color{codeText}},
+	numbers=left,
+	numbersep=4pt,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=4
+}
+\lstdefinelanguage{YAML}
+{%
+	alsoother     = @\$,
+	morecomment   = **[l]{\#},
+	morecomment   = **[s]{/*}{*/},
+	morestring    = **[s]{"}{"},
+}[keywords,strings,comments]
+\lstset{language=YAML} % Set default language
+
+\lstdefinelanguage{JSON}
+{%
+	string       = [s]{"}{"},
+	stringstyle  = \color{blue},
+	comment      = [l]{:},
+	commentstyle = \color{black},
+}[strings,comments]
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		{\huge\bfseries Verification of the Prefix Sum Program in an OpenCL Environment\par}
+		
+		\vspace{1cm}
+		{\LARGE Thijs Wiefferink\par}
+		{\large thijs@wiefferink.me, s1366564}
+		
+		\vfill
+		
+		{\Large
+			University of Twente		
+		}
+	\end{center}
+
+\end{titlepage}
+\newpage
+
+
+\section*{Abstract}
+\todo{write}
+
+
+\section*{Keywords}
+\todo{write}
+
+
+\section*{Preface}
+\todo{explain how this builds on the bachelor projects}
+
+
+\newpage
+\tableofcontents
+
+
+\section{Introduction}
+
+\subsection{Research domain}
+\todo{verification language, VerCors}
+
+\subsection{Problem statement}
+\todo{use of verification}
+
+\subsection{Research question}
+\todo{write}
+
+\subsection{Approach}
+\todo{verification process and problem solving}
+
+\subsection{Report structure}
+\todo{introduce chapters}
+
+
+\section{Prefix sum algorithm}
+\todo{explain parallel prefix sum, based on bachelorreferaat paper}
+
+
+\section{Verifying permissions}
+\todo{verification process of the read/write permissions of the array (initial based on bachelorreferaat, extended to allow functional verification)}
+
+
+\section{Verifying functionality}
+\todo{verification process of the functionality of the program}
+
+
+\section{Discussion}
+\todo{summary}
+
+\subsection{Results}
+\todo{result description: verified}
+
+\subsection{Related work}
+\todo{similar verification projects}
+
+
+\section{Conclusion}
+\todo{summary}
+
+\subsection{Research question answer}
+\todo{works, not for huge programs though}
+
+\subsection{Limitations and problems}
+\todo{tool limitations, change code for verification process}
+
+\subsection{Research value}
+\todo{do larger programs, improve tool, concurrency}
+
+\subsection{Future work}
+\todo{larger programs, improve tool}
+
+
+\bibliographystyle{abbrv}
+\bibliography{Report}
+
+\end{document}

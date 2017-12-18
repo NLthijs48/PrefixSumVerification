@@ -1,0 +1,9 @@
+# Latex
+*.log
+*.aux
+*.out
+*.synctex.gz
+*.synctex.gz(busy)
+*.bbl
+*.blg
+*.toc
