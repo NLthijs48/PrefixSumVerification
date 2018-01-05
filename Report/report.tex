@@ -172,9 +172,15 @@ The algorithm to calculate prefix sums can be structured in such a way that larg
 For the verification of the Prefix Sum program Permission-Based Separation Logic is used to specify the behavior of the program, and the tool VerCors is used to verify that the code matches the specification. A description of Permission-Based Separation Logic can be found in the previous project\cite{bachelorThesis}. 
 
 \subsection{Problem statement}
-\todo{use of verification}
+Making sure a program has no data races, and always gives correct results is extremely hard, if not impossible with traditional testing. For a single-threaded application testing all inputs should prove that the program is correct, but for multi-threaded applications this does not prove anything about data races. Therefore verification techniques have been developed to prove that a program always matches the specification.
 
 \subsection{Research question}
+
+\begin{enumerate}
+	\item How can the Prefix Sum program be proven to have no data races?
+	\item How can the Prefix Sum program be proven to give the correct result?
+\end{enumerate}
+
 \todo{write}
 
 \subsection{Approach}
@@ -219,8 +225,11 @@ For the verification of the Prefix Sum program Permission-Based Separation Logic
 \todo{do larger programs, improve tool, concurrency}
 
 \subsection{Future work}
-\todo{larger programs, improve tool}
-
+\begin{enumerate}
+	\item Larger programs
+	\item Improve tool
+	\item Handle more functional details: overflow, underflow, etc.
+\end{enumerate}
 
 \bibliographystyle{abbrv}
 \bibliography{Report}
