@@ -143,9 +143,33 @@ The necessary background information will be included in this report to understa
 This chapter describes the research domain, shows the problem that is solved, introduces the research questions and explains the approach.
 
 \subsection{Research domain}
-A graphics processing unit (GPU) is a device designed to rapidly manipulate and alter memory to accelerate the creation of images, for example while watching a video or playing a game. However, GPUs are also used more for general purpose computing, which is traditionally handled by the central processing unit (CPU). GPUs are better than CPUs doing parallel execution on large data sets. For example increasing the brightness of an image is easily done by a GPU, since this operation can be done in parallel on all pixels of the image. GPUs are however also used for physics calculations or mining crypto currencies.
+In this section the context information of this research project is described.
 
-\todo{verification language, VerCors}
+\subsubsection{GPU computing}
+A graphics processing unit (GPU) is a device designed to rapidly manipulate and alter memory to accelerate the creation of images, for example while watching a video or playing a game. However, GPUs are also used more for general purpose computing, which is traditionally handled by the central processing unit (CPU). GPUs are better than CPUs doing parallel execution on large data sets. For example increasing the brightness of an image is easily done by a GPU, since this operation can be done in parallel on all pixels of the image. GPUs are however also used for physics calculations or mining crypto currencies. When using a GPU for general computing an API has to be used, I have chosen OpenCL for the previous research project because of its hardware vendor independency and open source nature. 
+
+Running a parallel computation on a GPU brings a couple of challenges. The first challenge is preventing data races. A data race is the situation in a program where multiple threads are accessing the same memory location, with at least one of them writing to the location. The second challenge is verifying the correctness of the functionality of the program. Verifying both of these aspects is useful for safety critical systems.
+
+The previous research project has started with the verification process to show that a program (specifically the Prefix Sum algorithm) has no data races. Since only the first half of the program could be verified in the given time for the project the verification has been continued in this project.
+
+\subsubsection{Prefix Sum}
+To show what the prefix sum is and how it is calculated, this section repeats the information from the previous project\cite{bachelorThesis} below.
+
+The algorithm computes the sums of all possible prefixes of an input array. In Figure~\ref{prefixsumexample}, a mathematical representation of the prefix sum is illustrated, $x$ represents the input array, $x_0$ indicates the first element from the input array, where $n$ represents the size of the input array, and $y$ is the output array containing the prefix sums. Each number $y_a$ in the output array is the sum of all numbers $x_b \in x$ for which the condition $b<a$ holds.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/prefix-sum-v1.png}
+	\caption{Prefix Sum description}
+	\label{prefixsumexample}
+\end{figure}
+
+The Prefix Sum algorithm is an interesting case study because it is a building block for a lot of other algorithms. For example radix sort and quicksort can be implemented using Prefix Sums, but it can also be used to lexically compare strings of characters or to search for regular expressions \cite{Blelloch:PrefixSumApplications}. In the field of specifying and verifying GPU programs the Prefix Sum is a suitable next step, because it will be a bigger and more complex example of verifying a GPU program.
+
+The algorithm to calculate prefix sums can be structured in such a way that large amounts of data can be processed in parallel. A multi threaded algorithm meant for the GPU has been implemented in the previous project. The verification process continues with this same algorithm. The implemented version of the Prefix Sum is based on Chapter 39 \emph{Parallel Prefix Sum (Scan) with CUDA} of the book GPU Gems 3 \cite{Nguyen:GPUGems3}.
+
+\subsubsection{Verification}
+For the verification of the Prefix Sum program Permission-Based Separation Logic is used to specify the behavior of the program, and the tool VerCors is used to verify that the code matches the specification. A description of Permission-Based Separation Logic can be found in the previous project\cite{bachelorThesis}. 
 
 \subsection{Problem statement}
 \todo{use of verification}
