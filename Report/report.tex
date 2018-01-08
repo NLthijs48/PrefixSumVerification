@@ -100,6 +100,14 @@
 	commentstyle = \color{black},
 }[strings,comments]
 
+\lstset{language=C, escapechar=$} % Set default language to C
+% Enable using math mode in code
+\lstset{
+	mathescape,         
+	literate={->}{$\rightarrow$}{2}
+	{ε}{$\varepsilon$}{1}
+}
+
 \begin{document}
 
 \begin{titlepage}
@@ -198,7 +206,79 @@ When encountering a problem during the verification, Stefan Blom (author of VerC
 
 
 \section{Prefix sum algorithm}
-\todo{explain parallel prefix sum, based on bachelorreferaat paper}
+The sections below are repeated from the previous project\cite{bachelorThesis}, describing the algorithm that is used for calculating the Prefix Sum in parallel.
+
+\subsection{Prefix Sum algorithm} \label{implementBasic}
+The basic single thread Prefix Sum algorithm is simple, but cannot be used with multiple threads. The trivial way to compute Prefix Sums would be to compute it as described in Listing~\ref{singleThreadAlgorithm}. In the loop body of this algorithm it depends on knowing the result of the previous sum, because of this data dependency the algorithm cannot be used to calculate Prefix Sums concurrently. 
+
+\begin{lstlisting}[caption=Single thread Prefix Sum, label=singleThreadAlgorithm, float=htpb]
+result[0] := 0
+for a := 1 to n do  
+	result[a] := input[a-1] + result[a-1]
+\end{lstlisting}
+
+The algorithm implemented for this research is made by Blelloch \cite{Blelloch:PrefixSum}, and can be used concurrently. The description of Nguyen \cite{Nguyen:GPUGems3} has been followed to implement the algorithm. The \emph{Simple-OpenCL} library \cite{Huguet:SimpleCL} of O. A. Huguet and C. G. Marin has been used to implement the OpenCL kernels. The algorithm by Blelloch performs the Prefix Sum calculation in two phases, the up-sweep phase and down-sweep phase. The algorithm uses a balanced binary tree for data storage, therefore a tree with $log_2(n)$+1 levels is required to accommodate for an input of size \emph{n}. If the input size is not a power of 2, then the input will be padded with zeros until it is; this is necessary because the algorithm requires a binary tree. The tree has $d=log_2(n)$+1 levels, and each level $d$ has $2^d$ nodes. At the start the input values will be placed in the \emph{n} leaves at the bottom of the tree, see Figure~\ref{treeStart}. The up-sweep phase traverses the tree from the leaves to the root, level by level, and computes partial sums in the nodes of the tree. At each level the sum of 2 nodes is computed and placed in the node above, at the end the root node contains the sum of all elements in the input. Figure~\ref{treeUpSweep} shows the end result of this phase.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-start.png}
+	\caption{Tree at the start of the up-sweep phase}
+	\label{treeStart}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-upsweep.png}
+	\caption{Tree after the up-sweep phase}
+	\label{treeUpSweep}
+\end{figure}
+
+After this first phase the second phase will start, called the down-sweep phase. This phase starts by inserting zero at the root of the tree, after that it traverses the tree from the root to the leaves. On each level the right child will be set to the sum of the left child and the current node, and the left child will be set to the value of the current node. This way the zero that has been inserted at the root will travel to the leftmost leaf, and intermediate sums will travel to the right, and get added to form the final result. Figure~\ref{treeDownSweepFirst} illustrates the first step, the right node will get the value $0+10$, the left node will get value $0$. Figure~\ref{treeDownSweepSecond} shows the result of the second step, and Figure~\ref{treeDownSweepFinal} shows the end result, with an exclusive prefix sum in the leaves of the tree. An exclusive prefix sum means that each output value is the sum of all inputs with a lower index, instead of a lower or the same index as with an inclusive prefix sum.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-downsweep-first.png}
+	\caption{The first step of the down-sweep phase}
+	\label{treeDownSweepFirst}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-downsweep-second.png}
+	\caption{The second step of the down-sweep phase}
+	\label{treeDownSweepSecond}
+\end{figure}
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-downsweep-final.png}
+	\caption{The final step of the down-sweep phase}
+	\label{treeDownSweepFinal}
+\end{figure}
+\FloatBarrier
+
+\subsection{Two-dimensional Arrays As Storage} \label{prefixSumStorage}
+Now that the algorithm of the Prefix Sum has been explained in Section~\ref{implementBasic}, the storage of the tree in memory will be looked at. A common way to store a binary tree in an array is to have the root node at index $i=1$, with the left child at $i*2$ and the right child at $i*2+1$. Such a storage solution would require an array of twice the size of the input, which is the minimum required size for this algorithm to work. The disadvantage of this storage type is that at each level of the tree in the up- and down-sweep phase only a part of the threads running the kernel are active. To illustrate, in the example of Figure~\ref{treeUpSweep} about the up-sweep phase, 4 threads would be required to run this kernel, with 4 of them active on the lowest level, then 2 on the level above, and 1 for the highest level. To make the correct threads active and idle, the kernel has code that shuts off certain threads in certain iterations of the up-sweep phase. This code causes branch divergence, which means that certain threads of a kernel are running different code as other threads. Because threads run different code, the SIMT principle is disturbed.
+
+To prevent the problem mentioned above a different version of the Prefix Sum algorithm has been implemented that uses another storage solution for the binary tree. The algorithm has a two-dimensional array, the first array stores an array for each level of the tree, and those levels have values for each node of the tree. The two-dimensional array has a height of $log_2(n)$+1, and a width the same as the inputsize n. The nodes of a tree are aligned to the left in the level arrays, which leaves blank spots on all levels except the lowest one. Because of these blank spots we can now let all threads do the calculation as explained in Section~\ref{implementBasic}. The threads that normally would have been idle will now perform operations on the blank spots of the two-dimensional array, which do not interfere with the actually useful calculations. This change has a positive effect on the performance of the kernel because of reduced branch divergence \cite{Han:ReducingBranchDivergence}. The kernel of the one-dimensional array would need to be split each time it is executed, since there are threads executing different code. But this is not the case for the two-dimensional array version, in which all threads do exactly the same operations (although on different data). The previous research project has benchmarked the two solutions and confirmed that the two-dimensional array has better performance.
+
+\subsection{Algorithmic description} \label{sec:implAlgorithmic}
+The algorithm with the two-dimensional arrays works as described in Listing~\ref{prefixSumUpsweep} (up-sweep phase) and Listing~\ref{prefixSumDownsweep} (down-sweep phase). The loops at respectively line 2 and line 3 of these algorithms are to indicate that one work item of the GPU will do the calculation inside the loop. The arrays used in the algorithms have their first dimension represent the level of the tree, and their second dimension the node of tree on the given level. The algorithms assume that the values of the nodes of the tree are stored as much to the left as possible, so for example the root of the tree has 0 as the second dimension of the array, and the highest possible number on the first dimension: $log_2(n)-1$.
+
+\begin{lstlisting}[caption=Upsweep phase, label=prefixSumUpsweep, float=htpb]
+for d=1 to $log_2(n)$ do
+	for all k=0 to n-1 in parallel do 
+		x[d][k] := x[d-1][k*2] + x[d-1][k*2+1]
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Downsweep phase, label=prefixSumDownsweep, float=htpb]
+x[($log_2$(n)-1)*n] := 0
+for d=$log_2$(n)-1 to 1 do
+	for all k=0 to n-1 in parallel do
+		x[d-1][k*2+1] = x[d-1][k*2] + x[d][k]
+		x[d-1][k*2] = x[d][k]
+\end{lstlisting}
+\FloatBarrier
 
 
 \section{Verifying permissions}
