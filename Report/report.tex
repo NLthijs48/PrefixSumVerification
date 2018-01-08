@@ -100,12 +100,10 @@
 	commentstyle = \color{black},
 }[strings,comments]
 
-\lstset{language=C, escapechar=$} % Set default language to C
+\lstset{language=C, escapechar=`} % Set default language to C
 % Enable using math mode in code
 \lstset{
-	mathescape,         
-	literate={->}{$\rightarrow$}{2}
-	{ε}{$\varepsilon$}{1}
+	mathescape=true
 }
 
 \begin{document}
@@ -266,14 +264,14 @@ To prevent the problem mentioned above a different version of the Prefix Sum alg
 The algorithm with the two-dimensional arrays works as described in Listing~\ref{prefixSumUpsweep} (up-sweep phase) and Listing~\ref{prefixSumDownsweep} (down-sweep phase). The loops at respectively line 2 and line 3 of these algorithms are to indicate that one work item of the GPU will do the calculation inside the loop. The arrays used in the algorithms have their first dimension represent the level of the tree, and their second dimension the node of tree on the given level. The algorithms assume that the values of the nodes of the tree are stored as much to the left as possible, so for example the root of the tree has 0 as the second dimension of the array, and the highest possible number on the first dimension: $log_2(n)-1$.
 
 \begin{lstlisting}[caption=Upsweep phase, label=prefixSumUpsweep, float=htpb]
-for d=1 to $log_2(n)$ do
+for d=1 to `$log_2(n)$` do
 	for all k=0 to n-1 in parallel do 
 		x[d][k] := x[d-1][k*2] + x[d-1][k*2+1]
 \end{lstlisting}
 
 \begin{lstlisting}[caption=Downsweep phase, label=prefixSumDownsweep, float=htpb]
-x[($log_2$(n)-1)*n] := 0
-for d=$log_2$(n)-1 to 1 do
+x[(`$log_2$`(n)-1)*n] := 0
+for d=`$log_2$`(n)-1 to 1 do
 	for all k=0 to n-1 in parallel do
 		x[d-1][k*2+1] = x[d-1][k*2] + x[d][k]
 		x[d-1][k*2] = x[d][k]
@@ -282,7 +280,46 @@ for d=$log_2$(n)-1 to 1 do
 
 
 \section{Verifying permissions}
-\todo{verification process of the read/write permissions of the array (initial based on bachelorreferaat, extended to allow functional verification)}
+This chapter describes the process of verifying the read/write permissions of the Prefix Sum program. It starts with the result of the previous research, expands it to the downsweep phase, after which the specification is simplified.
+
+\subsection{Starting point}
+Listing \ref{specification:previous} shows the specification as was made during the previous project. This specification has been verified until the end of the upsweep phase. The specification of the downsweep phase has been written down, as well as the ensures for the complete program, but these could not be verified by VerCors yet at that time.
+
+This specification is a good starting point for completing the read/write permissions verification. The process of extending this specification is described in the next section.
+
+\lstinputlisting[
+	caption={
+		Specification as written in the previous project,\\
+		only the upsweep part is verified
+	},
+	label=specification:previous,
+	linewidth=13cm,
+	basicstyle={\scriptsize\ttfamily\color{codeText}}
+]{specifications/previous.pvl}
+
+\subsection{Verifying the downsweep array permissions}
+
+
+
+
+\lstinputlisting[
+	caption={
+		Specification as written in the previous project,\\
+		only the upsweep part is verified
+	},
+	label=specification:basic,
+	linewidth=13cm,
+	basicstyle={\scriptsize\ttfamily\color{codeText}}
+]{specifications/basic.pvl}
+
+
+\todo{Steps:}
+\begin{enumerate}
+	\item Show version of previous research
+	\item Extend to downsweep and program ensures (Permissions V2, show the encountered problems)
+	\item Half threads version (HalfThreads, show encountered problems)
+	\item Explain functional ideas (new permissions layouts)
+\end{enumerate}
 
 
 \section{Verifying functionality}

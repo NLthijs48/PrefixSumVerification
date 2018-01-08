@@ -1,0 +1,114 @@
+class Ref {
+	// Requires/Ensures for the complete kernel
+	requires N==32 && H==6;																	$\label{spec:kernelSpecStart}$
+	requires (\forall* int i; 0<=i && i<N; Perm(input[i], read));
+	requires (\forall* int i; 0<=i && i<N; Perm(output[i], write));
+	requires (\forall* int i; 0<=i && i<N; 
+		(\forall* int j; 0<=j && j<H; Perm(temp[j][i], write))
+	);
+	ensures N==32 && H==6;
+	ensures (\forall* int i; 0<=i && i<N; Perm(input[i], read));
+	ensures (\forall* int i; 0<=i && i<N; Perm(output[i], write));
+	ensures (\forall* int i; 0<=i && i<N; 
+		(\forall* int j; 1<=j && j<H; Perm(temp[j][i], write))
+	);
+	ensures (\forall* int i; 0<=i && i<N; Perm(temp[0][i], write));			 				$\label{spec:kernelSpecEnd}$
+	// Kernel method
+	void prefixSum(int N, int H, int[N] input, int[N] output, int[H][N] temp) {				$\label{spec:kernelHeader}$
+		// Define N threads (parallel block)
+		par threads (int t=0..N;;true)														$\label{spec:parStart}$
+			requires N==32 && H==6;
+			requires t<(N/2) ==> Perm(input[t*2], read);
+			requires t<(N/2) ==> Perm(input[t*2+1], read);
+			requires t<(N/2) ==> Perm(output[t*2], write);
+			requires t<(N/2) ==> Perm(output[t*2+1], write);
+			requires t<(N/2) ==> Perm(temp[0][t*2], write);
+			requires t<(N/2) ==> Perm(temp[0][t*2+1], write);
+			requires (\forall* int j; 1<=j && j<H; Perm(temp[j][t], write));
+			ensures N==32 && H==6;			
+			ensures t<(N/2) ==> Perm(input[t*2], read);
+			ensures t<(N/2) ==> Perm(input[t*2+1], read);
+			ensures t<(N/2) ==> Perm(output[t*2], write);
+			ensures t<(N/2) ==> Perm(output[t*2+1], write);
+			ensures t<(N/2) ==> Perm(temp[0][t*2], write);
+			ensures t<(N/2) ==> Perm(temp[0][t*2+1], write);
+			ensures (\forall* int j; 1<=j && j<H; Perm(temp[j][t], write));					$\label{spec:parSpecEnd}$
+		// Thread code	
+		{
+			// Only use the first half of threads
+			if(t < (N/2)) {																	$\label{spec:copyInputStart}$
+				// Input copy
+				temp[0][t*2]   = input[t*2];
+				temp[0][t*2+1] = input[t*2+1];
+				// First step of upsweep
+				temp[1][t] = temp[0][t*2] + temp[0][t*2+1];
+			}																				$\label{spec:copyInputEnd}$
+			int level=1;
+			loop_invariant N==32 && H==6;
+			loop_invariant t>=0 && t<N;
+			loop_invariant level>=1 && level<H;
+			loop_invariant (\forall* int i; level<=i && i<H; Perm(temp[i][t], write));		$\label{spec:columnRemainder}$
+			loop_invariant t<(N/2) ==> (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2], write));
+            loop_invariant t<(N/2) ==> (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+1], write));
+			while((level+1)<H) {															$\label{spec:upsweepStart}$
+				level = level+1;
+				barrier(local) {
+					requires N==32 && H==6;
+					requires t>=0 && t<N;
+					requires level>=1 && level<H;
+					requires Perm(temp[level-1][t], write));
+					
+					ensures N==32 && H==6; 
+					ensures level>=1 && level<H;
+					ensures t>=0 && t<N;
+					ensures Perm(temp[level][t], write));
+					ensures t<(N/2) ==> Perm(temp[level-1][t*2], write));
+					ensures t<(N/2) ==> Perm(temp[level-1][t*2+1], write));
+				}
+				// Do next upsweep step
+				if(t < (N/2)) {
+					temp[level][t] = temp[level-1][t*2] + temp[level-1][t*2+1];
+				}
+			}																				$\label{spec:upsweepEnd}$
+
+			// Set the root to 0
+			temp[H-1][t] = 0;
+			// Downsweep phase																			
+			int level=H-1;
+			loop_invariant N==32 && H==6;
+			loop_invariant t>=0 && t<N;
+			loop_invariant level>=1 && level<H;
+			loop_invariant (\forall* int i; level<i && i<H; Perm(temp[i][t], write));
+			loop_invariant t<(N/2) ==> (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2], write));
+            loop_invariant t<(N/2) ==> (\forall* int i; 0<=i && i<level; Perm(temp[i][t*2+1], write));
+			while((level-1)>0) {															$\label{spec:downSweepStart}$
+				level = level-1;
+				barrier(local) {
+					requires N==32 && H==6;
+					requires t>=0 && t<N;
+					requires level>=1 && level<H;
+					requires t<(N/2) ==> Perm(temp[level][t*2], write);
+					requires t<(N/2) ==> Perm(temp[level][t*2+1], write);
+					
+					ensures N==32 && H==6; 
+					ensures level>=1 && level<H;
+					ensures t>=0 && t<N;
+					ensures Perm(temp[level][t], write);
+					ensures t<(N/2) ==> Perm(temp[level-1][t*2], write);
+					ensures t<(N/2) ==> Perm(temp[level-1][t*2+1], write);
+				}
+				// Do next downsweep step
+				if(t < (N/2)) {
+					temp[level-1][t*2+1] = temp[level-1][t*2] + temp[level][t]; // Set right child
+					temp[level-1][t*2] = temp[level][t]; // Set left child
+				}
+			}																				$\label{spec:downSweepEnd}$
+			
+			// Copy the result from the tree to the output array
+			if(t < (N/2)) {																	$\label{spec:setOutput}$
+				output[t*2] = temp[0][t*2];
+				output[t*2+1] = temp[0][t*2+1];		
+			}					
+		}
+	}
+}
