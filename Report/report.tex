@@ -172,16 +172,17 @@ The algorithm to calculate prefix sums can be structured in such a way that larg
 For the verification of the Prefix Sum program Permission-Based Separation Logic is used to specify the behavior of the program, and the tool VerCors is used to verify that the code matches the specification. A description of Permission-Based Separation Logic can be found in the previous project\cite{bachelorThesis}. 
 
 \subsection{Problem statement}
-Making sure a program has no data races, and always gives correct results is extremely hard, if not impossible with traditional testing. For a single-threaded application testing all inputs should prove that the program is correct, but for multi-threaded applications this does not prove anything about data races. Therefore verification techniques have been developed to prove that a program always matches the specification.
+Making sure a program has no data races, and always gives correct results is extremely hard, if not impossible with traditional testing. For a single-threaded application testing all inputs should prove that the program is correct, but for multi-threaded applications this does not prove anything about data races. In order to verify the correctness of a program it has to be specified in Permission-Based Separation Logic, which is a challenge for bigger programs like the Prefix Sum. VerCors, the tool used to verify the specification, will get slower when a larger specification is used. This makes using the tool correctly and efficiently a challenge. During the previous project a number of problems in the tools have been identified that blocked the verification, during this project this will be the case as well.
 
-\subsection{Research question}
-
+\subsection{Research questions}
+The following research questions have been formed from the problem statement:
 \begin{enumerate}
 	\item How can the Prefix Sum program be proven to have no data races?
 	\item How can the Prefix Sum program be proven to give the correct result?
+	\item What are the limitations of VerCors for verifying GPU programs?
 \end{enumerate}
 
-\todo{write}
+The first research question has partially been proven by the previous research, which will be used as a starting point. To answer it fully the specification of the Prefix Sum algorithm has to be extended to the complete program (add the downsweep and final permissions). For the second research question the specification created for the first question has to be extended with information about the results. The third question is to review the VerCors tool, which will be done during the verification process of the first two questions.
 
 \subsection{Approach}
 \todo{verification process and problem solving}
