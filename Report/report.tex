@@ -298,7 +298,53 @@ This specification is a good starting point for completing the read/write permis
 ]{specifications/previous.pvl}
 
 \subsection{Verifying the downsweep array permissions}
+Listing \ref{specification:basic} shows the working specification of all permissions of the \code{input}, \code{output} and \code{temp} array. The specification made in the previous project was quite close, but required some adjustments to verify with VerCors. First the permissions that should be active are explained, after which the required specification updates are shown.
 
+\subsubsection{Input array permissions}
+The input array permissions are shown in Figure \ref{fig:inputArrayPermissions}, the array indices are shown at the bottom, the numbers inside the squares indicate the thread number that has access. The figure shows the input array for an input size of 8. This means that there will be 8 thread, of which only the first 4 will get any permissions. Each thread has access to indexes $t*2$ and $t*2+1$, where $t$ is the thread number. In the upsweep phase the first half of the threads will start adding inputs together in consecutive pairs, so that is why the input array permissions are distributed like this.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/input-permissions-v1.png}
+	\caption{Permissions of the input array}
+	\label{fig:inputArrayPermissions}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Tree array permissions}
+The tree array permissions are more complex, and will change during the up and downsweep. At the start of the program the permissions are as shown in Figure \ref{fig:treeArrayPermissionsStart}. This figure shows the tree array with $N$ horizontally and $H$ vertically. The numbers in the squares show which thread has write access. A part of the squares have no background color, these are still included, but serve no actual purpose other than improving performance by reducing branch divergence as shown in the previous research project.
+
+The permissions of the bottom row ($H=0$) are like the input array, each thread has access to index $t*2$ and $t*2+1$. In the other rows the indices are simply assigned to their thread number. The first step of the downsweep will start with $tree[1][0] = tree[0][0] + tree[0][1]$, which thread 0 can do because it has write permissions to each of these locations. Thread 1, 2 and 3 have permissions to the next locations, doing the same computation as thread 0 while adjusting their indices using the thread number.
+
+With the initial permissions of the input array and the bottom row of the tree array, the input can be copied to the bottom row of the tree array. The first half of the threads will do this task, each copying two consecutive locations, again $t*2$ and $t*2+1$.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-start-v1.png}
+	\caption{Permissions of the tree array before starting the downsweep}
+	\label{fig:treeArrayPermissionsStart}
+\end{figure}
+\FloatBarrier
+
+The \code{barrier()} of the upsweep will update the tree permissions row-by-row. Each iteration of the while loop the permission layout of the bottom row is applied to the next row above, until all but the top-most row has that permission layout.
+
+\subsubsection{Output array permissions}
+
+
+
+\vspace{3cm}
+\todo{Write these:}
+\begin{enumerate}
+	\item Permission tables
+	\item First step of the downsweep was not in previous
+	\item Updated \code{loop\_invariant} from \code{level<i} to \code{level<=i}
+	\item Merged barrier requires
+	\item Removed barrier ensures, don't make sense
+	\item \code{assert} statements
+	\item \code{temp != null}
+	\item \code{id(0)} and \code{id(1)}
+	\item Updated program ensures (last row permissions have also updated)
+\end{enumerate}
 
 
 
