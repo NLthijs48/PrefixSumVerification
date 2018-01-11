@@ -321,14 +321,63 @@ With the initial permissions of the input array and the bottom row of the tree a
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=80mm]{../images/tree-permissions-start-v1.png}
-	\caption{Permissions of the tree array before starting the downsweep}
+	\caption{Permissions of the tree array before starting the upsweep}
 	\label{fig:treeArrayPermissionsStart}
 \end{figure}
 \FloatBarrier
 
-The \code{barrier()} of the upsweep will update the tree permissions row-by-row. Each iteration of the while loop the permission layout of the bottom row is applied to the next row above, until all but the top-most row has that permission layout.
+The \code{barrier()} of the upsweep will update the tree permissions row-by-row. Each iteration of the while loop the permission layout of the bottom row is applied to the next row above, until all but the top-most row has that permission layout. The resulting permissions are shown in Figure \ref{fig:treeArrayPermissionsMiddle}.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-middle-v1.png}
+	\caption{Permissions of the tree after upsweep}
+	\label{fig:treeArrayPermissionsMiddle}
+\end{figure}
+\FloatBarrier
+
+After the upsweep the program will set the root of the tree to zero, each thread has still access to the cell of its thread id, so each thread updates one cell.
+
+Now the downsweep can start, for which the starting permissions are as shown in Figure \ref{fig:treeArrayPermissionsMiddle}. For all rows below the top-most row, the first half of threads will update two cells, at $t*2$ and $t*2+1$. The first computation can immediately start, because the permissions are already correct. For the following rows the permissions need to be updated row-by-row, reverting the permissions that have been added for the upsweep. After the downsweep the permissions will look as shown in Figure \ref{fig:treeArrayPermissionsEnd}.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-middle-v1.png}
+	\caption{Permissions of the tree after the downsweep}
+	\label{fig:treeArrayPermissionsEnd}
+\end{figure}
+\FloatBarrier
 
 \subsubsection{Output array permissions}
+At the end of the computation the result is at the bottom row of the tree array and will be copied to the output array. The bottom row of the tree array still has the layout where each thread has access to $t*2$ and $t*2+1$. So to easily copy the results the output array should have the same permission layout. The resulting permission layout is the same as the input array as shown in Figure \ref{fig:inputArrayPermissions}. Now the first half of threads can copy the result and the Prefix Sum computation is complete.
+
+
+\subsubsection{Specification changes}
+Below the changes to the specification of the previous research project are explained.
+
+\textbf{Merged barrier clauses}\\
+The barrier of the upsweep phase changes the permissions, as described above in the permissions layout. The original specification used one require, and two ensures in the barrier to accomplish this change, as shown in Listing \ref{listing:specPreviousBarrier}. VerCors could not match these statements correctly through the while loop, to solve this problem the ensures clauses have been merged into one ensure clause, as shown in Listing \ref{listing:specBasicBarrier}. Both of these options mean exactly the same, but is is hard for VerCors to recognize the original one. Ideally this would be fixed in the tool, but this was not trivial. This alternative notation has been provided by the tool author.
+
+\begin{lstlisting}[caption=Upsweep barrier permissions clauses (before merging), label=listing:specPreviousBarrier, float=htpb]
+requires Perm(tree[level-1][t], write));
+ensures t<(N/2) ==> Perm(tree[level-1][t*2], write));
+ensures t<(N/2) ==> Perm(tree[level-1][t*2+1], write));
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Upsweep barrier permissions clauses (after merging), label=listing:specBasicBarrier, float=htpb]
+requires Perm(tree[level-1][t], write));
+ensures t<(N/2) ==> (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], write));
+\end{lstlisting}
+
+A similar merge was required for the downsweep barrier, in this case two require clauses have been merged into a single one using the same technique.
+
+\textbf{First step of the downsweep}\\
+The first iteration of the downsweep has been extracted from the while loop. This was necessary because the permission layout of the tree array was already correct for the first iteration, so doing a barrier was not necessary yet. Extracting this first iteration leads to code duplication for the downsweep operation, which will be addressed in later specification versions. This change also meant updating the loop\_invariant of the downsweep while loop, the \code{level<i} has been replaced with \code{level<=i} in the loop\_invariant that describes the write permissions of the temp array of all rows except the bottom one.
+
+
+\textbf{Assert statements}\\
+
+\textbf{Barrier ensures cleanup}\\
 
 
 
@@ -336,12 +385,10 @@ The \code{barrier()} of the upsweep will update the tree permissions row-by-row.
 \todo{Write these:}
 \begin{enumerate}
 	\item Permission tables
-	\item First step of the downsweep was not in previous
-	\item Updated \code{loop\_invariant} from \code{level<i} to \code{level<=i}
 	\item Merged barrier requires
 	\item Removed barrier ensures, don't make sense
 	\item \code{assert} statements
-	\item \code{temp != null}
+	\item \code{tree != null}
 	\item \code{id(0)} and \code{id(1)}
 	\item Updated program ensures (last row permissions have also updated)
 \end{enumerate}
