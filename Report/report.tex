@@ -394,8 +394,7 @@ After the changes described above the specification is complete and verifies in 
 
 \lstinputlisting[
 	caption={
-		Specification as written in the previous project,\\
-		only the upsweep part is verified
+		Full permissions specification, verified using VerCors
 	},
 	label=specification:basic,
 	linewidth=13cm,
@@ -403,8 +402,27 @@ After the changes described above the specification is complete and verifies in 
 ]{specifications/basic.pvl}
 
 \subsection{Specification simplification}
-\todo{half threads version concept and changes}
+After finishing the specification for the array permissions, it felt like it was too verbose. The first problem is that a lot of clauses start with \code{t<(N/2)}, and most code blocks are also have the same condition. This condition disables the last half of the threads that are used in the kernel. Actually these threads are not useful at all and normally would not be used for the execution. The only reason the number of threads is double than necessary is that VerCors could not handle the correct number of threads at first. The syntax of specifying a GPU kernel program was different, and did not allow to easily use half the number of threads, and arrays did not accept expressions inside their declaration. Later the syntax updated based on the Java language syntax, so it basically is just a class with a method inside. So now it is possible to make a specification with half the number of threads, so that the result is a lot more compact and readable. The resulting specification will be discussed below.
 
+\lstinputlisting[
+caption={Compacted specification using only half the number of threads},
+label=specification:halfthreads,
+linewidth=13cm,
+basicstyle={\scriptsize\ttfamily\color{codeText}}
+]{specifications/halfthreads.pvl}
+
+\todo{Write about:}
+\begin{enumerate}
+	\item context clauses
+	\item N==16
+	\item New loop\_invariants of the while loops
+	\item Folded first iteration into the while loop, swapped computation and barrier in downsweep
+	\item Discussions with Stefan
+	\item \textbackslash matrix and \textbackslash array (removed tree!=null)
+\end{enumerate}
+
+
+\vspace{3cm}
 \todo{Steps:}
 \begin{enumerate}
 	\item Show version of previous research
@@ -432,6 +450,7 @@ After the changes described above the specification is complete and verifies in 
 \end{enumerate}
 
 \subsection{Results}
+
 \todo{result description: verified}
 
 \subsection{Related work}

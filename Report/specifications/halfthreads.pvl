@@ -1,151 +1,139 @@
-// -*- tab-width:4 ; indent-tabs-mode:nil -*-
-// running with: vercors/unix/bin/vct SPEC/cSpecLatest.pvl --silver=silicon --single-group --progress --detail
-
 class Ref {
-	// Requires/Ensures for complete kernel
-	requires N==32 && H==6;
-	requires tree != null;
-	requires (\forall* int i; 0<=i && i<N; Perm(input[i], read));
-	requires (\forall* int i; 0<=i && i<N; Perm(output[i], write));
-	requires (\forall* int i; 0<=i && i<N;
-				(\forall* int j; 0<=j && j<H; Perm(tree[j][i], write))
-			 );
-	
-	ensures N==32 && H==6;
-	ensures tree != null;
-	ensures (\forall* int i; 0<=i && i<N; Perm(input[i], read));
-	ensures (\forall* int i; 0<=i && i<N; Perm(output[i], write));
-	ensures (\forall* int i; 0<=i && i<N;
-				(\forall* int j; 0<=j && j<H; Perm(tree[j][i], write))
-			 );
+	// KERNEL
+	invariant N==16 && H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant \matrix(tree,H,N*2);
+	invariant \array(input,N*2);
+	invariant \array(output,N*2);
+	requires (\forall* int i; 0<=i && i<N*2; Perm(input[i], read));
+	requires (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
+	requires (\forall* int i; 0<=i && i<N*2;
+		(\forall* int j; 0<=j && j<H; Perm(tree[j][i], write))
+	);
+	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
 
-	// Kernel method
-	void test(int N, int H, int[N] input, int[N] output, int[H][N] tree) {
+		////////// THREADS
+		par runThreads (int t=0..N)
+			requires Perm(input[t], read);
+			requires Perm(input[t+N], read);
 
-		// Define threads
-		par tst (int t=0..N/2)
-			requires N==32 && H==6;
-			requires tree != null;
-			requires Perm(input[t*2], read);
-			requires Perm(input[t*2+1], read);
-			requires Perm(output[t*2], write);
-			requires Perm(output[t*2+1], write);
-			requires Perm(tree[0][t*2], write);
-			requires Perm(tree[0][t*2+1], write);
-			requires (\forall* int i; 1<=i && i<H; Perm(tree[i][t], write));
-			
-			ensures N==32 && H==6;
-			ensures Perm(input[t*2], read);
-			ensures Perm(input[t*2+1], read);
-			ensures Perm(output[t*2], write);
-			ensures Perm(output[t*2+1], write);
-			ensures Perm(tree[0][t*2], write);
-			ensures Perm(tree[0][t*2+1], write);
-			ensures (\forall* int i; 1<=i && i<H; Perm(tree[i][t], write));
+			requires Perm(output[t], write);
+			requires Perm(output[t+N], write);
 
-		// Thread code
+			requires (\forall* int k; 0<=k && k<2;
+				(\forall* int i; 0<=i && i<H; Perm(tree[i][k*N+t], write))
+			);
 		{
-			// Input copy
-			tree[0][t*2]   = input[t*2];
-			tree[0][t*2+1] = input[t*2+1];
-			// First step of up-sweep
-			tree[1][t] = tree[0][t*2] + tree[0][t*2+1];
+			////////// INPUT COPY
+			tree[0][t] = input[t];
+			tree[0][t+N] = input[t+N];
 
-			// Remaining steps of the upsweep phase
-			int level=1;
-			loop_invariant N==32 && H==6;
-			loop_invariant tree != null;
-			loop_invariant level>=1 && level<H;
+			////////// UPSWEEP
+			int level=0;
+			loop_invariant level>=0 && level<H;
 			loop_invariant t>=0 && t<N;
-			loop_invariant (\forall* int i; level<=i && i<H; Perm(tree[i][t], write));
-			loop_invariant (\forall* int i; 0<=i && i<level; Perm(tree[i][t*2], write));
-			loop_invariant (\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+1], write));
+			// Old permisison layout going away, top row excluded: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; level<=i && i<H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], write))
+			);
 			while((level+1)<H) {
 				level = level+1;
-				assert Perm(tree[level-1][t], write);
-				barrier(tst) {
-					// This barrier changes permissions from this situation:
-					// t1 | t2 | t3 | t4 | t5 | t6 | t7 | t8 ...
-					// to the following situation:
-					// t1 | t1 | t2 | t2 | t3 | t3 | t4 | t4 ...
-					// for levels 0 to (H-2), top row keeps the old layout
-					// (t1 means thread 1 has permission for that slot)
+				barrier(runThreads) {
+					context t>=0 && t<N;
+					context level>=1 && level<H;
 
-					requires tree != null;
-					requires N==32 && H==6;
-					requires level>=1 && level<H;
-					requires t>=0 && t<N;
 					requires Perm(tree[level-1][t], write);
+					requires Perm(tree[level-1][t+N], write);
 
-					ensures tree != null;
-					ensures N==32 && H==6;
-					ensures level>=1 && level<H;
-					ensures t>=0 && t<N;
 					ensures (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], write));
 				}
-				// Do next up-sweep step
-				assert tree != null;
-				assert N==32 && H==6;
-				assert level>=1 && level<H;
-				assert t>=0 && t<N;
-				assert  (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], write));
-				tree[level][t] = tree[level-1][t*2+id(0)] + tree[level-1][t*2+id(1)];
+				tree[level][t] = tree[level-1][t*2] + tree[level-1][t*2+1];
 			}
 
-			// Set the root to zero, preparation for down-sweep
-			tree[H-1][t] = 0;
+			////////// DOWNSWEEP
+			tree[H-1][t] = 0; // Set the root of the tree to zero
 
-			// Level is 5 here (H-1)
-			if(level-1>0) {
-				// First step of downsweep
-				tree[level-1][t*2+1] = tree[level-1][t*2] + tree[level][t];     // Right child
-				tree[level-1][t*2] = tree[level][t];                            // Left child
-			}
-
-			// Remaining steps of the downsweep
-			loop_invariant N==32 && H==6;
-			loop_invariant level>=1 && level<H;
+			loop_invariant level>=0 && level<H;
 			loop_invariant t>=0 && t<N;
-			loop_invariant tree != null;
-			loop_invariant (\forall* int i; level<=i && i<H; Perm(tree[i][t], write));
-			loop_invariant (\forall* int i; 0<=i && i<level; Perm(tree[i][t*2], write));
-			loop_invariant (\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+1], write));
-			while((level-1)>0) {
-				level = level-1;
-				assert Perm(tree[level][t*2+id(0)], write);
-				assert Perm(tree[level][t*2+id(1)], write);
-				barrier(tst) {
-					// This barrier changes permissions from this situation:
-					// t1 | t1 | t2 | t2 | t3 | t3 | t4 | t4 ...
-					// to the following situation:
-					// t1 | t2 | t3 | t4 | t5 | t6 | t7 | t8 ...
-					// for levels 1 to (H-2), top and bottom rows keep the old layout
-					// (t1 means thread 1 has permission for that slot)
-
-					requires N==32 && H==6;
-					requires t>=0 && t<N;
-					requires level>=1 && level<H;
-					requires (\forall* int k; 0<=k && k<2; Perm(tree[level][t*2+k], write));
-					requires tree != null;
-
-					ensures N==32 && H==6;
-					ensures level>=1 && level<H;
-					ensures t>=0 && t<N;
-					ensures Perm(tree[level][t], write);
-					ensures tree != null;
-				}
+			// Old permission layout coming back, top row already has it: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; level<=i && i<H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout going away, bottom row excluded: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0<=k && k<2;
+				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], write))
+			);
+			while(level>0) {
 				// Do next down-sweep step
-				assert tree != null;
-				assert N==32 && H==6;
-				assert level>=1 && level<H;
-				assert t>=0 && t<N;
-				assert Perm(tree[level][t], write);
 				tree[level-1][t*2+1] = tree[level-1][t*2] + tree[level][t];     // Right child
 				tree[level-1][t*2] = tree[level][t];                            // Left child
+
+				level = level-1;
+
+				barrier(runThreads) {
+					context t>=0 && t<N;
+					context level>=0 && level<H;
+
+					requires Perm(tree[level][t*2], write);
+					requires Perm(tree[level][t*2+1], write);
+
+					ensures Perm(tree[level][t], write);
+					ensures Perm(tree[level][t+N], write);
+				}
 			}
-			// Copy the result from the tree to the output array
-			output[t*2] = tree[0][t*2];
-			output[t*2+1] = tree[0][t*2+1];
+
+			////////// OUTPUT COPY
+			output[t] = tree[0][t];
+			output[t+N] = tree[0][t+N];
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
