@@ -90,7 +90,6 @@
 	morecomment   = **[s]{/*}{*/},
 	morestring    = **[s]{"}{"},
 }[keywords,strings,comments]
-\lstset{language=YAML} % Set default language
 
 \lstdefinelanguage{JSON}
 {%
@@ -297,7 +296,7 @@ This specification is a good starting point for completing the read/write permis
 	basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/previous.pvl}
 
-\subsection{Verifying the downsweep array permissions}
+\subsection{Verifying downsweep array permissions}
 Listing \ref{specification:basic} shows the working specification of all permissions of the \code{input}, \code{output} and \code{temp} array. The specification made in the previous project was quite close, but required some adjustments to verify with VerCors. First the permissions that should be active are explained, after which the required specification updates are shown.
 
 \subsubsection{Input array permissions}
@@ -374,26 +373,24 @@ A similar merge was required for the downsweep barrier, in this case two require
 \textbf{First step of the downsweep}\\
 The first iteration of the downsweep has been extracted from the while loop. This was necessary because the permission layout of the tree array was already correct for the first iteration, so doing a barrier was not necessary yet. Extracting this first iteration leads to code duplication for the downsweep operation, which will be addressed in later specification versions. This change also meant updating the loop\_invariant of the downsweep while loop, the \code{level<i} has been replaced with \code{level<=i} in the loop\_invariant that describes the write permissions of the temp array of all rows except the bottom one.
 
+\textbf{Array definition workaround}\\
+VerCors did not properly recognize the length of the array through the specification, and could sometimes not know that each specified array cell is unique. A workaround for this problem has been provided by Stefan Blom. By adding \code{tree != null} the tools handles array lengths correctly and knows its cells are unique. Hopefully this workaround can be removed in the future.
 
 \textbf{Assert statements}\\
+The VerCors tools could not get through the while loops correctly anymore after some updates, the underlying problem is in the external library Z3. This problem has been solved by adding \code{assert <condition>} statements just before and inside the barrier, and by using identity operators in some places. These statements force the tools to prove a certain condition at that point, which provides provides search options into the right direction (where previously the tools would run out of options). At the end the specification works, but got bigger with assert statements and has added complexity with identity operators \code{id(0)} and \code{id(1)}.
 
-\textbf{Barrier ensures cleanup}\\
+\textbf{Simplification failures}\\
+A couple of "simplification failure" errors have been encountered during the verification process. This happens when a \code{\\forall*} cannot be transformed to a rule that the internal prover accepts. Transformations like these happen with simple matching rules, that replace certain parts with others. For example a simplification failed at some point when instead of writing \code{0<=i \&\& i<N}, I wrote \code{i>=0 \&\& i<N}. These expressions mean the same exact thing, but the rules only match the first variant. These kind of problems would really need to be solved before VerCors can be used by anyone to verify their programs.
 
+\textbf{Cleanup}\\
+Inside the barrier of the upsweep there was an unnecessary ensures clause, which has been removed: \code{ensures Perm(tree[level][t], write));}.
+Additionally the ensures clause of the complete program has been simplified, it does not have a separate clause for the bottom row of the tree array anymore. The split clauses were not necessary, since the program simply has write permissions to all locations in the tree array, so it is pointless to split among multiple clauses.
 
+\textbf{Verification time}\\
+A side effect of all changes is that the time it takes to verify the specification went from around 2 minutes, to 6 minutes. Considering that the Prefix Sum is quite a trivial number of lines of code, this is quite long. This would prevent verifying large programs, because it simply takes too long to run, especially considering that the specification is rarely correct the first run. The author of the tool indicates that each \code{if} statement causes the verification time to go up, since there are more options to consider. Loops have an even larger impact, which is why this program saw the increase in verification time. The workaround with \code{assert} and \code{id()} also do not help performance.
 
-\vspace{3cm}
-\todo{Write these:}
-\begin{enumerate}
-	\item Permission tables
-	\item Merged barrier requires
-	\item Removed barrier ensures, don't make sense
-	\item \code{assert} statements
-	\item \code{tree != null}
-	\item \code{id(0)} and \code{id(1)}
-	\item Updated program ensures (last row permissions have also updated)
-\end{enumerate}
-
-
+\subsubsection{Result}
+After the changes described above the specification is complete and verifies in VerCors. It proves that the program does not contain data races, which is a good step towards proving the complete program.
 
 \lstinputlisting[
 	caption={
@@ -405,6 +402,8 @@ The first iteration of the downsweep has been extracted from the while loop. Thi
 	basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/basic.pvl}
 
+\subsection{Specification simplification}
+\todo{half threads version concept and changes}
 
 \todo{Steps:}
 \begin{enumerate}
@@ -421,6 +420,16 @@ The first iteration of the downsweep has been extracted from the while loop. Thi
 
 \section{Discussion}
 \todo{summary}
+
+\subsection{Verification performance}
+\todo{Current performance, options and solutions for the future}
+\begin{enumerate}
+	\item Scaling with classes
+	\item Scaling with methods
+	\item Improvements in Z3
+	\item Better hardware
+	\item Better progress during verification
+\end{enumerate}
 
 \subsection{Results}
 \todo{result description: verified}
