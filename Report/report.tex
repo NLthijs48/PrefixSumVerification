@@ -337,15 +337,7 @@ The \code{barrier()} of the upsweep will update the tree permissions row-by-row.
 
 After the upsweep the program will set the root of the tree to zero, each thread has still access to the cell of its thread id, so each thread updates one cell.
 
-Now the downsweep can start, for which the starting permissions are as shown in Figure \ref{fig:treeArrayPermissionsMiddle}. For all rows below the top-most row, the first half of threads will update two cells, at $t*2$ and $t*2+1$. The first computation can immediately start, because the permissions are already correct. For the following rows the permissions need to be updated row-by-row, reverting the permissions that have been added for the upsweep. After the downsweep the permissions will look as shown in Figure \ref{fig:treeArrayPermissionsEnd}.
-
-\begin{figure}[htb!]
-	\centering
-	\includegraphics[width=80mm]{../images/tree-permissions-middle-v1.png}
-	\caption{Permissions of the tree after the downsweep}
-	\label{fig:treeArrayPermissionsEnd}
-\end{figure}
-\FloatBarrier
+Now the downsweep can start, for which the starting permissions are as shown in Figure \ref{fig:treeArrayPermissionsMiddle}. For all rows below the top-most row, the first half of threads will update two cells, at $t*2$ and $t*2+1$. The first computation can immediately start, because the permissions are already correct. For the following rows the permissions need to be updated row-by-row, reverting the permissions that have been added for the upsweep. After the downsweep the permissions will be back to the situation before the upsweep, as shown in Figure \ref{fig:treeArrayPermissionsStart}.
 
 \subsubsection{Output array permissions}
 At the end of the computation the result is at the bottom row of the tree array and will be copied to the output array. The bottom row of the tree array still has the layout where each thread has access to $t*2$ and $t*2+1$. So to easily copy the results the output array should have the same permission layout. The resulting permission layout is the same as the input array as shown in Figure \ref{fig:inputArrayPermissions}. Now the first half of threads can copy the result and the Prefix Sum computation is complete.
@@ -405,19 +397,50 @@ After the changes described above the specification is complete and verifies in 
 After finishing the specification for the array permissions, it felt like it was too verbose. The first problem is that a lot of clauses start with \code{t<(N/2)}, and most code blocks are also have the same condition. This condition disables the last half of the threads that are used in the kernel. Actually these threads are not useful at all and normally would not be used for the execution. The only reason the number of threads is double than necessary is that VerCors could not handle the correct number of threads at first. The syntax of specifying a GPU kernel program was different, and did not allow to easily use half the number of threads, and arrays did not accept expressions inside their declaration. Later the syntax updated based on the Java language syntax, so it basically is just a class with a method inside. So now it is possible to make a specification with half the number of threads, so that the result is a lot more compact and readable. The resulting specification will be discussed below.
 
 \subsubsection{Half the number of threads}
-To half the number of threads the \code{N==32} clause has been changed to \code{N==16}. The \code{par} block that specifies the number of threads uses the N directly, so the number of threads is now correctly halved. The input, output and tree array specifications are changed to use $N*2$ as size, because they should stay the same size as before.
+To half the number of threads the \code{N==32} clause has been changed to \code{N==16}. The \code{par} block that specifies the number of threads uses the N directly, so the number of threads is now correctly halved. The input, output and tree array specifications are changed to use $N*2$ as size, because they should stay the same size as before. All of the $t<(N/2) ==>$ constructs have been removed, those are not necessary anymore.
+
+\subsubsection{Updated permissions}
+First of all the permissions of the input and output array have changed, now instead of letting only the first half of the threads copy locations $t*2$ and $t*2+1$, all threads (which are half) copy locations $t$ and $t+N$. The permissions have been changed accordingly.
+
+There were a couple of loop\_invariants that did not have a condition that excludes half of the threads, assigning certain permissions to each thread. Because the number of threads halved, this means that not all permissions are assigned anymore. The input and output array keep the same permissions structure, since these already used only the first half of the threads. The tree array has slightly different permissions though. On the rows where previously all threads had one cell, each thread now has $t$ and $t+N$. Figure \ref{fig:treeArrayPermissionsStartHalfThreads} shows the permissions layout before the upsweep, which can be compared to Figure \ref{fig:treeArrayPermissionsStart}. In the figure you can also see that the initial permissions of the bottom row are not in the $t*2$ and $t*2+1$ layout anymore, the reason for that is explained below.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-start-halfthreads-v1.png}
+	\caption{Permissions of the tree before the upsweep, updated for usage with half the number of threads}
+	\label{fig:treeArrayPermissionsStartHalfThreads}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Merged first iteration}
+Another improvement in this specification is that the first iterations of the upsweep and downsweep are not outside of the while loop anymore.
+
+For the upsweep this meant the permissions of the bottom row are now in the $t$ and $t+N$ layout at the start. This means that before the first upsweep step can be done, the permissions of the bottom row need to change. Because inside the while loop the barrier comes before the computation, this works correctly. First the barrier assigns new permissions to one row, after that the computation uses that row and the row above to do the upsweep step. After the upsweep the permissions look like shown in Figure \ref{fig:treeArrayPermissionsMiddleHalfThreads}, which only differs from Figure \ref{fig:treeArrayPermissionsMiddle} on the top row, where $t4$ until $t7$ have been replaced (since those threads are not used anymore). This cleans up the specification, removing a duplicate computation and some specification complexity.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-middle-halfthreads-v1.png}
+	\caption{Permissions of the tree after the upsweep, updated for usage with half the number of threads}
+	\label{fig:treeArrayPermissionsMiddleHalfThreads}
+\end{figure}
+\FloatBarrier
+
+For the downsweep different changes have been made. The permissions after the upsweep are already correct to do the first downsweep step, so the barrier and computation in the while loop have been swapped. Now the computation happens first, and the barrier as second, which gets the permissions ready for the next iteration. Because of this change the final permissions layout has changed, the bottom row is now also converted to the $t$ and $t+N$ layout. Figure \ref{fig:treeArrayPermissionsEndHalfThreads} shows the resulting permissions after the downsweep, which can be compared to Figure \ref{fig:treeArrayPermissionsStart}. This new layout has the same permissions on each row, while the previous one had special permissions on the last row. This is because of the updated while loop, that now changes the permissions of all rows.
+
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=80mm]{../images/tree-permissions-end-halfthreads-v1.png}
+	\caption{Permissions of the tree after the downsweep, updated for usage with half the number of threads}
+	\label{fig:treeArrayPermissionsEndHalfThreads}
+\end{figure}
+\FloatBarrier
+
+Finally because the permissions of the last row have changed, copying the result to the output array has been updated. Each thread now copies locations $t$ and $t+N$, because that is where they have permissions.
 
 \subsubsection{Compacting: invariant and context keywords}
 In the previous specification the clause \code{N==32 \&\& H==6} was repeated constantly, in each loop and barrier. To prevent this kind of repetition the \code{invariant} keyword is now available on the program level, so that specifying constants is only needed once. This cleans up a lot of clauses, making the specification easier to read and understand.
 
 Another pattern that is common in the previous specification is that a clause in the requires and ensures is the same. For example the barrier would repeat a condition of the loop\_invariant as a require and ensure, duplicating this specification. This has been solved by Stefan Blom by adding the \code{context} keyword in VerCors, which acts as a require and ensure at the same time. This compacted the specification of the barriers a bit, for the constraints of the thread number and the level.
-
-
-
-\subsubsection{Updated permissions loop\_invariants}
-
-
-\subsubsection{Merged first iteration}
 
 
 \lstinputlisting[
@@ -429,10 +452,6 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 
 \todo{Write about:}
 \begin{enumerate}
-	\item context clauses
-	\item N==16
-	\item New loop\_invariants of the while loops
-	\item Folded first iteration into the while loop, swapped computation and barrier in downsweep
 	\item Discussions with Stefan
 	\item \textbackslash matrix and \textbackslash array (removed tree!=null)
 \end{enumerate}
