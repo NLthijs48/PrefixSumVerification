@@ -437,6 +437,8 @@ For the downsweep different changes have been made. The permissions after the up
 
 Finally because the permissions of the last row have changed, copying the result to the output array has been updated. Each thread now copies locations $t$ and $t+N$, because that is where they have permissions.
 
+To be able to use indexing in the form of $t$ and $t+N$ VerCors has been updated by Stefan Blom, this allowed this specification to work.
+
 \subsubsection{Compacting: invariant and context keywords}
 In the previous specification the clause \code{N==32 \&\& H==6} was repeated constantly, in each loop and barrier. To prevent this kind of repetition the \code{invariant} keyword is now available on the program level, so that specifying constants is only needed once. This cleans up a lot of clauses, making the specification easier to read and understand.
 
@@ -445,28 +447,18 @@ Another pattern that is common in the previous specification is that a clause in
 \subsubsection{Cleanup: \textbackslash matrix and \textbackslash array}
 The previous specification contains a bunch of \code{tree != null} clauses, which were used as a way to ensure certain properties about the used arrays. This was a temporary workaround, which now has a permanent solution with \code{\textbackslash array} and \code{\textbackslash matrix} as replacements. In the specification \code{\textbackslash matrix(tree,H,N*2)} is used to indicate that \code{tree} is a two-dimensional array (also called matrix) with dimensions \code{H} by \code{N*2}. This information is used through the specification by VerCors to know the dimension of the array and other standard array properties. For the input and output array \code{\textbackslash array(input,N*2)} is used, specifying an array with one dimension. These changes mean that all \code{tree != null} clauses have been cleaned up, and make it more obvious what the inputs are. The workaround with \code{id(0)} and \code{id(1)} has also been removed, this is not necessary anymore because of improvements in VerCors.
 
+\subsubsection{Result}
+With the changes described above the specification has become smaller, easier to read, and with less workarounds.
+
+\subsection{Result}
+After first verifying a straightforward version of the permissions using a verbose specification, a compact version has been made. This last version is a nice and compact verification of the permissions (and therefore absence of data races) of the Prefix Sum, which can serve as a starting point for verifying the functionality. The next step is to find out the changes necessary for the functional verification, which is discussed in the next chapter.
+
 \lstinputlisting[
 caption={Compacted specification using only half the number of threads},
 label=specification:halfthreads,
 linewidth=13cm,
 basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/halfthreads.pvl}
-
-\todo{Write about:}
-\begin{enumerate}
-	\item Discussions with Stefan
-\end{enumerate}
-
-
-\vspace{3cm}
-\todo{Steps:}
-\begin{enumerate}
-	\item Show version of previous research
-	\item Extend to downsweep and program ensures (Permissions V2, show the encountered problems)
-	\item Half threads version (HalfThreads, show encountered problems)
-	\item Explain functional ideas (new permissions layouts)
-\end{enumerate}
-
 
 \section{Verifying functionality}
 \todo{verification process of the functionality of the program}
@@ -511,6 +503,10 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 	\item Improve tool
 	\item Handle more functional details: overflow, underflow, etc.
 \end{enumerate}
+
+\section{Acknowledgments}
+\todo{Marieke, Stefan, Saeed}
+
 
 \bibliographystyle{abbrv}
 \bibliography{Report}
