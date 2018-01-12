@@ -404,6 +404,22 @@ After the changes described above the specification is complete and verifies in 
 \subsection{Specification simplification}
 After finishing the specification for the array permissions, it felt like it was too verbose. The first problem is that a lot of clauses start with \code{t<(N/2)}, and most code blocks are also have the same condition. This condition disables the last half of the threads that are used in the kernel. Actually these threads are not useful at all and normally would not be used for the execution. The only reason the number of threads is double than necessary is that VerCors could not handle the correct number of threads at first. The syntax of specifying a GPU kernel program was different, and did not allow to easily use half the number of threads, and arrays did not accept expressions inside their declaration. Later the syntax updated based on the Java language syntax, so it basically is just a class with a method inside. So now it is possible to make a specification with half the number of threads, so that the result is a lot more compact and readable. The resulting specification will be discussed below.
 
+\subsubsection{Half the number of threads}
+To half the number of threads the \code{N==32} clause has been changed to \code{N==16}. The \code{par} block that specifies the number of threads uses the N directly, so the number of threads is now correctly halved. The input, output and tree array specifications are changed to use $N*2$ as size, because they should stay the same size as before.
+
+\subsubsection{Compacting: invariant and context keywords}
+In the previous specification the clause \code{N==32 \&\& H==6} was repeated constantly, in each loop and barrier. To prevent this kind of repetition the \code{invariant} keyword is now available on the program level, so that specifying constants is only needed once. This cleans up a lot of clauses, making the specification easier to read and understand.
+
+Another pattern that is common in the previous specification is that a clause in the requires and ensures is the same. For example the barrier would repeat a condition of the loop\_invariant as a require and ensure, duplicating this specification. This has been solved by Stefan Blom by adding the \code{context} keyword in VerCors, which acts as a require and ensure at the same time. This compacted the specification of the barriers a bit, for the constraints of the thread number and the level.
+
+
+
+\subsubsection{Updated permissions loop\_invariants}
+
+
+\subsubsection{Merged first iteration}
+
+
 \lstinputlisting[
 caption={Compacted specification using only half the number of threads},
 label=specification:halfthreads,
