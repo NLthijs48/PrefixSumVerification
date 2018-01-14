@@ -499,14 +499,21 @@ loop_invariant (\forall* int i; 0<=i && i<N*2; tree[0][i] == input[i]);
 \end{lstlisting}
 
 \subsubsection{Step 2: upsweep results}
-During the upsweep the tree array will be updated to contain partial sums of the input values. During iteration of the while loop a loop\_invariant should enforce the values of the tree array to be correct. Listing \ref{listing:functionalStepUpsweep} shows this condition. The condition expresses the result of the addition, 
+During the upsweep the tree array will be updated to contain partial sums of the input values. During iteration of the while loop a loop\_invariant should enforce the values of the tree array to be correct. Listing \ref{listing:functionalStepUpsweep} shows this condition. The condition expresses that for all levels that the loop has been through, the cells of the current thread have been added together.
 
 \begin{lstlisting}[caption=Upsweep loop\_invariant enforcing the results of the computation, label=listing:functionalStepUpsweep, float=htpb]
-loop_invariant level>0 ==> 
-	tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
+loop_invariant (\forall* int h; 0<h && h<level; 
+	tree[h][t] == tree[h-1][t*2] + tree[h-1][t*2+1];
+);
 \end{lstlisting}
 
+Currently I'm not sure this is enough to let VerCors proof the end condition, but it should be a good start. It might need to already know that each cell is the sum of a certain range of values from the bottom row of the tree array, which might look like shown in Listing \ref{listing:functionalStepUpSweepSum}.
 
+\begin{lstlisting}[caption=Upsweep loop\_invariant enforcing sum of inputs, label=listing:functionalStepUpsweepSum, float=htpb]
+tree[h][t] == \sum([t*2^level ..(t+1)*2^level), tree[0])
+\end{lstlisting}
+
+To support expressions like about the results of 
 
 \subsection{Results}
 \todo{how much is verified}
