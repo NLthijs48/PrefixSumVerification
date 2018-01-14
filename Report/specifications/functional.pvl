@@ -1,5 +1,4 @@
-// running with: ./unix/bin/vct ../VerCorsSpec/spec.pvl --silver=silicon --single-group --progress --detail --profile
-
+// TODO: update?
 class Ref {
 
 	////////// KERNEL
@@ -40,22 +39,33 @@ class Ref {
 			);
 			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
 			loop_invariant (\forall* int k; 0<=k && k<2;
-				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], write))
+				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], 1/2))
 			);
 
-			//loop_invariant tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
-			// we dont keep the old permissions in later loops, so this will not work?
-			//loop_invariant (\forall int i; 1<=i && i<=level; tree[i][t] == tree[i-1][t*2] + tree[i-1][t*2+1]);
+			loop_invariant (\forall* int k; 0<=k && k<4;
+				(\forall* int i; 0<=i && i<level; t<N/4 ==> Perm(tree[i][t*4+k], 1/2))
+			);
+
+			loop_invariant level>0 ==> tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
 			while((level+1)<H) {
 				level = level+1;
 				barrier(runThreads) {
 					context t>=0 && t<N;
 					context level>=1 && level<H;
 
+					// Ensure the result of the cells we give back permissions of
+					requires level-2>=0 ==> tree[level-1][t] == tree[level-2][t*2] + tree[level-2][t*2+1];
 					requires Perm(tree[level-1][t], write);
 					requires Perm(tree[level-1][t+N], write);
 
-					ensures (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], write));
+					ensures (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], 1/2));
+					// Only the first half of threads
+					ensures t<N/4 ==> (\forall* int k; 0<=k && k<4; Perm(tree[level-1][t*4+k], 1/2));
+					// Ensure the value of the cells we get permission for
+					// Check if source values are not outside tree on the bottom and right side
+					ensures level-2>=0 && t*4+1<N ==> tree[level-1][t*2] == tree[level-2][t*4] + tree[level-2][t*4+1];
+					ensures level-2>=0 && t*4+3<N ==> tree[level-1][t*2+1] == tree[level-2][t*4+2] + tree[level-2][t*4+3];
+
 				}
 				tree[level][t] = tree[level-1][t*2] + tree[level-1][t*2+1];
 			}
@@ -101,3 +111,49 @@ class Ref {
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

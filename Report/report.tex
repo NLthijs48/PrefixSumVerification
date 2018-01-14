@@ -461,6 +461,65 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/halfthreads.pvl}
 
 \section{Verifying functionality}
+The result of the previous chapter is a specification that verifies the permissions of the Prefix Sum program, proving that the program is data race free. This does however not prove that the computed end result is actually the Prefix Sum of the inputs. To prove this aspect the specification has to be extended with clauses about the result. This chapter will describe the steps taken to work towards a specification that verifies the permissions and functionality of the Prefix Sum algorithm. In the time slot for this project is was not possible to finish the verification of the functionality, but a couple of steps in the right direction have been taken.
+
+\subsection{Approach}
+For this extension of the specification the plan is once again to do it step-by-step. This needs to stay the way to tackle specifications for now, because writing all specifications at once is rarely getting verified by VerCors. However, this is more the human element than the fault of the tool, often it is hard to come up with all specifications at once, most of the time some simple required clauses are missing to let the tool verify the specification.
+
+The starting point will be the specification of the previous chapter, that specifies all permissions. To make the first additions quicker to test, the downsweep and output copy parts of the specification will be disabled at first. The ensures clauses of the kernel and threads will also be disabled, since these are not correct if the downsweep is disabled. When the upsweep is figured out and verifies, the downsweep can be enabled again. After that the functional specifications can be added to the downsweep, working towards a complete specification.
+
+\subsection{Goal}
+The goal that we are working towards is an ensure clause that specifies that the output array contains a prefix sum of the values in the input array. Such a clause would look like shown in Listing \ref{listing:functionalFullEnsure}. This clause specifies that each cell of the output should contain the sum of all values in the input array with an index between zero (inclusive) and its own index (exclusive). A new construct \code{\textbackslash sum} is used to express this condition, which sums all values of a range of indices. A range of indices can be specified using a special syntax \code{[0 ..i)}. This expression means sum all values starting at 0 (inclusive because of the square bracket), ending at \code{i} (exclusive because of the round bracket) of the \code{input} array.
+
+\begin{lstlisting}[caption=Ensure clause of the program that should be proven eventually, label=listing:functionalFullEnsure, float=htpb]
+ensures (
+	\forall* int i; 0<=i && i<N*2; 
+		output[i] == \sum([0 ..i), input
+);
+\end{lstlisting}
+
+\subsection{Verification steps}
+Before the condition described in the section above can be proven, a lot of steps needs to be taken. Below these steps are listed:
+\begin{enumerate}
+	\item The bottom row of the tree array is the same as the input array.
+	\item Each upsweep step a row of the tree array contains partial sums of input values.
+	\item The highest row of the tree array is zero.
+	\item Each downsweep step a row of the tree array contains updated partial sums of input values.
+	\item After the downsweep the bottom row contains the prefix sum (similar condition as in Listing \ref{listing:functionalFullEnsure} only talking about the bottom row of the tree array instead of the output array).
+	\item The output array contains the same prefix sum (condition of Listing \ref{listing:functionalFullEnsure}).
+\end{enumerate}
+
+Each of the above steps has some challenges, in terms of writing down the conditions itself and actually verifying it with VerCors. The next sections will discuss each step.
+
+\subsubsection{Step 1: tree array bottom row}
+The first step is to specify that the bottom row of the tree array has the same values as the input array. At the while loop of the upsweep this should be the case, so that is where a loop\_invariant will be added describing this condition. Listing \ref{listing:functionalStepBottomRow} shows this clause that is necessary for this.
+
+\begin{lstlisting}[caption=Bottom row of the tree array is equal to the input array, label=listing:functionalStepBottomRow, float=htpb]
+loop_invariant (\forall* int i; 0<=i && i<N*2; tree[0][i] == input[i]);
+\end{lstlisting}
+
+\subsubsection{Step 2: upsweep results}
+During the upsweep the tree array will be updated to contain partial sums of the input values. During iteration of the while loop a loop\_invariant should enforce the values of the tree array to be correct. Listing \ref{listing:functionalStepUpsweep} shows this condition. The condition expresses the result of the addition, 
+
+\begin{lstlisting}[caption=Upsweep loop\_invariant enforcing the results of the computation, label=listing:functionalStepUpsweep, float=htpb]
+loop_invariant level>0 ==> 
+	tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
+\end{lstlisting}
+
+
+
+\subsection{Results}
+\todo{how much is verified}
+
+
+\lstinputlisting[
+caption={Start of the functional specification},
+label=specification:functional,
+linewidth=13cm,
+basicstyle={\scriptsize\ttfamily\color{codeText}}
+]{specifications/functional.pvl}
+
+
 \todo{verification process of the functionality of the program}
 
 
