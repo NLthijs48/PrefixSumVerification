@@ -570,37 +570,49 @@ Most of the related work are simply the example provided by VerCors in the \code
 
 The basics of VerCors are described in \cite{blom2014vercors}, which introduces the tool. The architecture and a couple more details are shown in \cite{amighi2012vercors}. Other verification projects have been done with VerCors, but most using Java instead of the PVL language.
 
+\subsection{Limitations and problems}
+In this section the limitations and problems encountered during this project will be discussed. A first problem is that the code of the algorithm that computes the Prefix Sum has been changed during the specification process. Especially at the start code sometimes had to change to be able to properly create a specification. In my opinion verification should add an extra layer to code, but not force code to change, except when you uncover actual problems in the code. At the end the program has been restored to a version that is close to the original algorithm, so during this project VerCors has improved and allowed the code to stay clean.
+
+A second problem is the performance of VerCors. The tool will run longer when the specification is longer, and this looks exponential with the number of if/while conditions. This will become a problem when trying to prove larger programs. To show the time it takes for VerCors to prove a specification, see Table \ref{table:runTimes}. As shown in the table, it starts with verification times of a couple seconds, increases to minutes when doing the downsweep, and finally for the full program increases to 36 minutes. As long as the verification is in the seconds or at least less than 10 minutes it is doable to verify a program. But if it gets any longer it is simply too slow to be able to iterate quickly enough. This is a severe problem for adoption of VerCors for large programs.
+
+\begin{table*}[ht]
+	\centering \caption{Verification times permissions specification, Listing \ref{specification:halfthreads}}
+	\begin{tabular}{p{80mm}p{20mm}} \hline
+		\textbf{Until specification part} & \textbf{Time}\\\hline
+		Input copy & 7882ms\\\hline
+		Upsweep & 12745ms\\\hline
+		Downsweep & 92351ms\\\hline
+		Downsweep with thread ensures & 1934471ms\\\hline
+		Downsweep with thread and kernel ensures & 2190647ms\\\hline
+	\end{tabular}
+	\label{table:runTimes}
+\end{table*}
+
+There are some possibilities for improving the performance of VerCors. A first issue is that only one core is used for the verification, while modern systems usually at least have 4. When verifying programs with multiple methods VerCors can use multiple cores, but in this case it is just one method. Different classes can also be verified in parallel, so verifying a program consisting of multiple classes can be speed up by having a system with a good multi-core processor. To improve the verification times of a single method, the underlying proving libraries like Z3 could be improved. Or the translated specification that VerCors produces and passes to the underlying prover could be improved. It is however not likely that VerCors will ever be able to work linearly depending on the number of if/while conditions, since each such a condition simply introduces a lot more options. The fact that this program is a GPU kernel, which basically has a sort of loop for all threads makes the verification complexity higher, causing longer run times. Regular Java programs will have quicker verification because the additional thread loop is absent.
+
+In conclusion, as long as programs use small methods the verification should be quick enough. Once a program has large methods, like the algorithm shown here it will become a lot harder to prove quick enough to be useful. Further investigation of the performance could be done to see where the bottlenecks are, which is something Stefan Blom already introduced a \code{--profile} command line flag for.
 
 \section{Conclusion}
-\todo{summary}
+Below the research questions are answered and the value of this project is described. After that future work is discussed, which could build on this project.
 
-\subsection{Research question answer}
-\todo{works, not for huge programs though}
+\subsection{Research questions answers}
+The first research question asks how the Prefix Sum program can be proven to have no data races. This question has been answered with the specification and verification of the program using VerCors.
 
-\subsection{Limitations and problems}
-\todo{tool limitations, change code for verification process}
-\subsubsection{Verification performance}
-\todo{Current performance, options and solutions for the future}
-\begin{enumerate}
-	\item Scaling with classes
-	\item Scaling with methods
-	\item Improvements in Z3
-	\item Better hardware
-	\item Better progress during verification
-\end{enumerate}
+The second research question asks how the Prefix Sum program can be proven to give the correct result. This question has not been completely answered, although a specification has been made the verification process with VerCors has not been completed. This will require more time, but has a good chance of succeeding given that problems in the tool can be solved.
+
+The third research question asks about the limitations of VerCors for verifying GPU programs. This question is answered above in the discussion section. Large programs are possible to verify, although methods will need to stay reasonably small. For verifying GPU programs I would not recommend anything that is much larger than this Prefix Sum program in terms of if/while statements, because that would make iterating on the specification really hard. For the final conditions of the Prefix Sum specifications it already took a long time, since often the tool would run for half an hour, only to find out there is a small mistake in the specification.
 
 \subsection{Research value}
-\todo{do larger programs, improve tool, concurrency}
+This project has contributed to improving VerCors by finding bugs and asking for extensions. For example the new clauses like \code{\textbackslash context} and the top level \code{\textbackslash invariant} are also in response to my feedback. Some bugs in the tool that led to accepting wrong specifications with a "verified" result have also been fixed. This is in my opinion critical, since the last thing you want is a verification tool that accepts wrong specifications.
+
+Next to this the work done in this project can be used as example for GPU verification, and might be a stepping stone for verifying other programs of the same size, or even larger.
 
 \subsection{Future work}
-\begin{enumerate}
-	\item Larger programs
-	\item Improve tool
-	\item Handle more functional details: overflow, underflow, etc.
-\end{enumerate}
+Since the functionality of the Prefix Sum could not be verified fully yet, this would be interesting to look into in the future. Next to this other algorithms could be verified to test the tool further. VerCors could also be improved more, accepting more variants of specifications to make it easier to pick up if you are new with using it. A simple addition to the tool would be automatically adding conditions for the range of the thread variable for GPU programs, since this does never change and is currently repeated all the time.
+
 
 \section{Acknowledgments}
-\todo{Marieke, Stefan, Saeed}
+I would like to thank Marieke Huisman for providing the initial Bachelor thesis project that got me into program verification and specifically verifying a parallel Prefix Sum program for the GPU. Marieke also has given me the opportunity to do this research project based on the Bachelor project results. Next to that she provided feedback and suggestions about the project. Next I would like to thank Saeed Darabi which guided me through the Bachelor project together with Marieke. Finally I want to thank Stefan Blom a lot for his quick responses to my feedback about VerCors. I submitted bugs and feedback to Stefan and most of the time he had a new VerCors release for me within a day. I also appreciate his suggestions for the specification, he helped a lot to get it to form that VerCors can handle, and helped me with small details I would have otherwise not have thought about.
 
 
 \bibliographystyle{abbrv}
