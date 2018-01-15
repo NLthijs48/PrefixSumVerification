@@ -1,29 +1,31 @@
-// TODO: update?
 class Ref {
 
 	////////// KERNEL
-	invariant N==16 && H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant N==16 && H==6;
 	invariant \matrix(tree,H,N*2);
 	invariant \array(input,N*2);
 	invariant \array(output,N*2);
-	requires (\forall* int i; 0<=i && i<N*2; Perm(input[i], read));
-	requires (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
-	requires (\forall* int i; 0<=i && i<N*2;
+	context (\forall* int i; 0<=i && i<N*2; Perm(input[i], read));
+	context (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
+	context (\forall* int i; 0<=i && i<N*2;
 		(\forall* int j; 0<=j && j<H; Perm(tree[j][i], write))
 	);
 	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
 
 		////////// THREADS
 		par runThreads (int t=0..N)
-			requires Perm(input[t], read);
-			requires Perm(input[t+N], read);
+			context Perm(input[t], read);
+			context Perm(input[t+N], read);
 
-			requires Perm(output[t], write);
-			requires Perm(output[t+N], write);
+			context Perm(output[t], write);
+			context Perm(output[t+N], write);
 
-			requires (\forall* int k; 0<=k && k<2;
+			context (\forall* int k; 0<=k && k<2;
 				(\forall* int i; 0<=i && i<H; Perm(tree[i][k*N+t], write))
 			);
+
+			ensures output[t] == \sum([0 ..t), input);
+			ensures output[t+N] == \sum([0 ..t+N), input);
 		{
 			////////// INPUT COPY
 			tree[0][t] = input[t];
@@ -33,20 +35,19 @@ class Ref {
 			int level=0;
 			loop_invariant level>=0 && level<H;
 			loop_invariant t>=0 && t<N;
-			// Old permisison layout going away, top row excluded: (t1 | t2 | t3 | t4 | ...)
+			// Permissions
 			loop_invariant (\forall* int k; 0<=k && k<2;
 				(\forall* int i; level<=i && i<H; Perm(tree[i][k*N+t], write))
 			);
-			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
 			loop_invariant (\forall* int k; 0<=k && k<2;
 				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], 1/2))
 			);
-
 			loop_invariant (\forall* int k; 0<=k && k<4;
 				(\forall* int i; 0<=i && i<level; t<N/4 ==> Perm(tree[i][t*4+k], 1/2))
 			);
-
-			loop_invariant level>0 ==> tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
+			// Functional
+			loop_invariant (\forall* int i; 0<=i && i<N*2; tree[0][i] == input[i]);
+			loop_invariant ((t+1)*2^level < N*2) => tree[level][t] == \sum([t*2^level ..(t+1)*2^level), input);
 			while((level+1)<H) {
 				level = level+1;
 				barrier(runThreads) {
@@ -75,17 +76,17 @@ class Ref {
 
 			loop_invariant level>=0 && level<H;
 			loop_invariant t>=0 && t<N;
-			// Old permission layout coming back, top row already has it: (t1 | t2 | t3 | t4 | ...)
+			// Permissions
 			loop_invariant (\forall* int k; 0<=k && k<2;
 				(\forall* int i; level<=i && i<H; Perm(tree[i][k*N+t], write))
 			);
-			// New permission layout going away, bottom row excluded: (t1 | t1 | t2 | t2 | ...)
 			loop_invariant (\forall* int k; 0<=k && k<2;
 				(\forall* int i; 0<=i && i<level; Perm(tree[i][t*2+k], write))
 			);
-
-			//loop_invariant tree[level-1][t*2+1] == \old(tree[level-1][t*2]) + tree[level][t]; // after the loop body tree[level-1][t*2] has changed
-			//loop_invariant tree[level-1][t*2] == tree[level][t];
+			// Results
+			loop_invariant tree[H-1][t] == 0;
+			loop_invariant (t*2^(level-1) < N*2) => tree[level-1][t*2] == \sum([0 ..t*2^(level-1)], input);
+			loop_invariant (t*2^(level-1) < N*2) => tree[level-1][t*2+1] == \sum([0 ..t*2^(level-1)+1], input);
 			while(level>0) {
 				// Do next down-sweep step
 				tree[level-1][t*2+1] = tree[level-1][t*2] + tree[level][t];     // Right child

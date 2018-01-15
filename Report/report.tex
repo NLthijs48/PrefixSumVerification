@@ -474,7 +474,7 @@ The goal that we are working towards is an ensure clause that specifies that the
 \begin{lstlisting}[caption=Ensure clause of the program that should be proven eventually, label=listing:functionalFullEnsure, float=htpb]
 ensures (
 	\forall* int i; 0<=i && i<N*2; 
-		output[i] == \sum([0 ..i), input
+		output[i] == \sum([0 ..i), input)
 );
 \end{lstlisting}
 
@@ -484,9 +484,8 @@ Before the condition described in the section above can be proven, a lot of step
 	\item The bottom row of the tree array is the same as the input array.
 	\item Each upsweep step a row of the tree array contains partial sums of input values.
 	\item The highest row of the tree array is zero.
-	\item Each downsweep step a row of the tree array contains updated partial sums of input values.
-	\item After the downsweep the bottom row contains the prefix sum (similar condition as in Listing \ref{listing:functionalFullEnsure} only talking about the bottom row of the tree array instead of the output array).
-	\item The output array contains the same prefix sum (condition of Listing \ref{listing:functionalFullEnsure}).
+	\item Each downsweep step a row of the tree array contains updated partial sums of input values, after the last iteration this will already specify that the bottom row contains the prefix sum.
+	\item The output array contains the prefix sum (condition of Listing \ref{listing:functionalFullEnsure}).
 \end{enumerate}
 
 Each of the above steps has some challenges, in terms of writing down the conditions itself and actually verifying it with VerCors. The next sections will discuss each step.
@@ -499,35 +498,61 @@ loop_invariant (\forall* int i; 0<=i && i<N*2; tree[0][i] == input[i]);
 \end{lstlisting}
 
 \subsubsection{Step 2: upsweep results}
-During the upsweep the tree array will be updated to contain partial sums of the input values. During iteration of the while loop a loop\_invariant should enforce the values of the tree array to be correct. Listing \ref{listing:functionalStepUpsweep} shows this condition. The condition expresses that for all levels that the loop has been through, the cells of the current thread have been added together.
+During the upsweep the tree array will be updated to contain partial sums of the input values. During iteration of the while loop a loop\_invariant should enforce the values of the tree array to be correct. Listing \ref{listing:functionalStepUpsweep} shows this condition. The condition expresses that two cells on a row below have been added to the current row. This condition does not yet hold up at the start of the while loop, which is why the precondition \code{level>0} has been added.
 
 \begin{lstlisting}[caption=Upsweep loop\_invariant enforcing the results of the computation, label=listing:functionalStepUpsweep, float=htpb]
-loop_invariant (\forall* int h; 0<h && h<level; 
-	tree[h][t] == tree[h-1][t*2] + tree[h-1][t*2+1];
-);
+loop_invariant level>0 ==> tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
 \end{lstlisting}
 
-Currently I'm not sure this is enough to let VerCors proof the end condition, but it should be a good start. It might need to already know that each cell is the sum of a certain range of values from the bottom row of the tree array, which might look like shown in Listing \ref{listing:functionalStepUpSweepSum}.
+Currently I'm not sure this is enough to let VerCors proof the end condition, but it should be a good start. It might need to already know that each cell is the sum of a certain range of values from the bottom row of the tree array, which might look like shown in Listing \ref{listing:functionalStepUpSweepSum}. One problem is that threads do not have access to all cells at the lower row of the tree array, so this condition would lead to permissions errors. Instead the input array might be used, but I'm unsure if this can be proven using VerCors. 
+
+The precondition is necessary because not all threads will have complete results at all levels, as shown earlier the higher rows in the tree array have some dummy values, to increase performance.
 
 \begin{lstlisting}[caption=Upsweep loop\_invariant enforcing sum of inputs, label=listing:functionalStepUpsweepSum, float=htpb]
-tree[h][t] == \sum([t*2^level ..(t+1)*2^level), tree[0])
+((t+1)*2^level < N*2) => tree[level][t] == \sum([t*2^level ..(t+1)*2^level), tree[0]);
 \end{lstlisting}
 
-To support expressions like about the results of 
+\subsubsection{Step 3: highest row to zero}
+After the upsweep the top row of the tree array will be set to zero, in preparation of the downsweep. At the while loop of the downsweep an invariant about this row will be placed, as shown in Listing \ref{listing:functionalStepZero}. With this information the downsweep condition can be written.
+
+\begin{lstlisting}[caption=Top row of the tree array to zero, label=listing:functionalStepZero, float=htpb]
+loop_invariant tree[H-1][t] == 0;
+\end{lstlisting}
+
+\subsubsection{Step 4: downsweep results} 
+The next clause should be about the results of the computation of the downsweep loop. Listing \ref{listing:functionalStepDownsweep} shows conditions that could be added to verify this result. The first condition specifies that a value from level has been copied to a level below, at twice the thread index. This computation takes the value from a node in the binary tree, and assigns it to its left child. The right child has a different computation, it is set to the sum of the left child and the parent. Because the left child is also updated by the previous computation, the \code{\textbackslash old} function is put around the value of the left child in the specification.
+
+\begin{lstlisting}[caption=Downsweep results loop\_invariant, label=listing:functionalStepDownsweep, float=htpb]
+loop_invariant tree[level-1][t*2+1] = \old(tree[level-1][t*2]) + tree[level][t];
+loop_invariant tree[level-1][t*2] = tree[level][t];
+\end{lstlisting}
+
+Specifying the partial sum that should be in the result cells is also possible, the condition for that is shown in Listing \ref{listing:functionalStepDownsweepSum}. Once again threads do not have access to all required cells of the lower row of the tree array, so instead the input array could be used.
+
+\begin{lstlisting}[caption=Downsweep summed results, label=listing:functionalStepDownsweepSum, float=htpb]
+loop_invariant (t*2^(level-1) < N*2) => tree[level-1][t*2] == \sum([0 ..t*2^(level-1)], tree[0]);
+loop_invariant (t*2^(level-1) < N*2) => tree[level-1][t*2+1] == \sum([0 ..t*2^(level-1)+1], tree[0]);
+\end{lstlisting}
+
+\subsubsection{Step 5: output results}
+Finally the results that have appeared on the bottom row of the tree array will be copied to the output array. This result will be verified in an ensures clause of the thread block and the kernel ensure. The condition of the thread block will be as shown in Listing \ref{listing:functionalThreadEnsure}.
+
+The conditions the complete kernel will have is shown in Listing \ref{listing:functionalFullEnsure}. With this last information the full program should be verified, in this all works in VerCors.
+
+\begin{lstlisting}[caption={Ensures clause of the kernel, verifying the output array results}, label=listing:functionalThreadEnsure, float=htpb]
+output[t] == \sum([0 ..t), input);
+output[t+N] == \sum([0 ..t+N), input);
+\end{lstlisting}
 
 \subsection{Results}
-\todo{how much is verified}
-
+Of the steps that are described above, only the first one is verified by VerCors. Because the verification process takes a long time, verifying and compacting the specification of the permissions took a long time. The descriptions above should however be a good starting point to verify the functionality of the Prefix Sum algorithm with VerCors. It will require more time and effort, and most likely additions to VerCors, but should be possible.
 
 \lstinputlisting[
-caption={Start of the functional specification},
+caption={Work in progress functional specification},
 label=specification:functional,
 linewidth=13cm,
 basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/functional.pvl}
-
-
-\todo{verification process of the functionality of the program}
 
 
 \section{Discussion}

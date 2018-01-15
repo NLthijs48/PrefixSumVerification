@@ -4,22 +4,22 @@ class Ref {
 	invariant \matrix(tree,H,N*2);
 	invariant \array(input,N*2);
 	invariant \array(output,N*2);
-	requires (\forall* int i; 0<=i && i<N*2; Perm(input[i], read));
-	requires (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
-	requires (\forall* int i; 0<=i && i<N*2;
+	context (\forall* int i; 0<=i && i<N*2; Perm(input[i], read));
+	context (\forall* int i; 0<=i && i<N*2; Perm(output[i], write));
+	context (\forall* int i; 0<=i && i<N*2;
 		(\forall* int j; 0<=j && j<H; Perm(tree[j][i], write))
 	);
 	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
 
 		////////// THREADS
 		par runThreads (int t=0..N)
-			requires Perm(input[t], read);
-			requires Perm(input[t+N], read);
+			context Perm(input[t], read);
+			context Perm(input[t+N], read);
 
-			requires Perm(output[t], write);
-			requires Perm(output[t+N], write);
+			context Perm(output[t], write);
+			context Perm(output[t+N], write);
 
-			requires (\forall* int k; 0<=k && k<2;
+			context (\forall* int k; 0<=k && k<2;
 				(\forall* int i; 0<=i && i<H; Perm(tree[i][k*N+t], write))
 			);
 		{
