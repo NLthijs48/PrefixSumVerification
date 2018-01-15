@@ -109,7 +109,7 @@
 
 \begin{titlepage}
 	\begin{center}
-		{\huge\bfseries Verification of the Prefix Sum Program in an OpenCL Environment\par}
+		{\huge\bfseries Verification of the Parallel Prefix Sum Program with VerCors\par}
 		
 		\vspace{1cm}
 		{\LARGE Thijs Wiefferink\par}
@@ -127,15 +127,15 @@
 
 
 \section*{Abstract}
-\todo{write}
+This project continues the verification of a parallel Prefix Sum program. The program is intended for running on a GPU using OpenCL, the used algorithm is suitable for this purpose. The verification is done using Permissions-Based Separation Logic and PVL (toy language for verification purposes) to create a specification and VerCors to verify this specification. The Prefix Sum program has been proven data race free in this project. The result of the program has not yet been verified, but a specification has been made to start with this verification. During the project improvements have been made to VerCors by the author Stefan Blom to support this research and make future use easier.
 
 
 \section*{Keywords}
-\todo{write}
+\textbf{VerCors, Permission-Based Separation Logic, GPU, OpenCL, verification, specification}
 
 
 \section*{Preface}
-This project is the continuation of my bachelor thesis project, in which the verification of the prefix sum algorithm has been started. Since only the 'data race free' part has been proven for the first part of the algorithm (the upsweep), the goal of this project is to prove the complete algorithm data race free, and additionally prove the functionality of the algorithm.
+This project is the continuation of my bachelor thesis project, in which the verification of the prefix sum algorithm has been started. Since only the 'data race free' part has been proven for the first part of the algorithm (the upsweep), the goal of this project is to prove the complete algorithm data race free, and additionally try to prove the functionality of the algorithm.
 
 The necessary background information will be included in this report to understand the goal and results of the project, but full details of the Bachelor project can be read in the paper of that project \cite{bachelorThesis}.
 
@@ -199,10 +199,10 @@ To answer the third research question notes will be made during the verification
 When encountering a problem during the verification, Stefan Blom (author of VerCors) will be contacted to see if there is a problem in VerCors and if/how that could be solved.
 
 \subsection{Report structure}
-\todo{introduce chapters}
+Firstly Chapter \ref{chapter:prefixSum} explains the prefix sum algorithm to know the program that will be verified. After that the verification of the permissions of the program will be done in Chapter \ref{chapter:verifyingPermissions}. Chapter \ref{chapter:verifyingFunctionality} builds on the permissions with the functional verification. The results are discussed in Chapter \ref{chapter:discussion} and the conclusions are drawn in Chapter \ref{chapter:conclusion}.
 
 
-\section{Prefix sum algorithm}
+\section{Prefix sum algorithm}\label{chapter:prefixSum}
 The sections below are repeated from the previous project\cite{bachelorThesis}, describing the algorithm that is used for calculating the Prefix Sum in parallel.
 
 \subsection{Prefix Sum algorithm} \label{implementBasic}
@@ -278,7 +278,7 @@ for d=`$log_2$`(n)-1 to 1 do
 \FloatBarrier
 
 
-\section{Verifying permissions}
+\section{Verifying permissions}\label{chapter:verifyingPermissions}
 This chapter describes the process of verifying the read/write permissions of the Prefix Sum program. It starts with the result of the previous research, expands it to the downsweep phase, after which the specification is simplified.
 
 \subsection{Starting point}
@@ -460,7 +460,7 @@ linewidth=13cm,
 basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/halfthreads.pvl}
 
-\section{Verifying functionality}
+\section{Verifying functionality}\label{chapter:verifyingFunctionality}
 The result of the previous chapter is a specification that verifies the permissions of the Prefix Sum program, proving that the program is data race free. This does however not prove that the computed end result is actually the Prefix Sum of the inputs. To prove this aspect the specification has to be extended with clauses about the result. This chapter will describe the steps taken to work towards a specification that verifies the permissions and functionality of the Prefix Sum algorithm. In the time slot for this project is was not possible to finish the verification of the functionality, but a couple of steps in the right direction have been taken.
 
 \subsection{Approach}
@@ -555,7 +555,7 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 ]{specifications/functional.pvl}
 
 
-\section{Discussion}
+\section{Discussion}\label{chapter:discussion}
 Below the results will be discussed and related work will be shown.
 
 \subsection{Results}
@@ -592,7 +592,7 @@ There are some possibilities for improving the performance of VerCors. A first i
 
 In conclusion, as long as programs use small methods the verification should be quick enough. Once a program has large methods, like the algorithm shown here it will become a lot harder to prove quick enough to be useful. Further investigation of the performance could be done to see where the bottlenecks are, which is something Stefan Blom already introduced a \code{--profile} command line flag for.
 
-\section{Conclusion}
+\section{Conclusion}\label{chapter:conclusion}
 Below the research questions are answered and the value of this project is described. After that future work is discussed, which could build on this project.
 
 \subsection{Research questions answers}
@@ -611,7 +611,7 @@ Next to this the work done in this project can be used as example for GPU verifi
 Since the functionality of the Prefix Sum could not be verified fully yet, this would be interesting to look into in the future. Next to this other algorithms could be verified to test the tool further. VerCors could also be improved more, accepting more variants of specifications to make it easier to pick up if you are new with using it. A simple addition to the tool would be automatically adding conditions for the range of the thread variable for GPU programs, since this does never change and is currently repeated all the time.
 
 
-\section{Acknowledgments}
+\section{Acknowledgments}\label{chapter:acknowledgments}
 I would like to thank Marieke Huisman for providing the initial Bachelor thesis project that got me into program verification and specifically verifying a parallel Prefix Sum program for the GPU. Marieke also has given me the opportunity to do this research project based on the Bachelor project results. Next to that she provided feedback and suggestions about the project. Next I would like to thank Saeed Darabi which guided me through the Bachelor project together with Marieke. Finally I want to thank Stefan Blom a lot for his quick responses to my feedback about VerCors. I submitted bugs and feedback to Stefan and most of the time he had a new VerCors release for me within a day. I also appreciate his suggestions for the specification, he helped a lot to get it to form that VerCors can handle, and helped me with small details I would have otherwise not have thought about.
 
 
