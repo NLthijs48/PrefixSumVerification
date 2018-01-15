@@ -556,24 +556,19 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 
 
 \section{Discussion}
-\todo{summary}
-
-\subsection{Verification performance}
-\todo{Current performance, options and solutions for the future}
-\begin{enumerate}
-	\item Scaling with classes
-	\item Scaling with methods
-	\item Improvements in Z3
-	\item Better hardware
-	\item Better progress during verification
-\end{enumerate}
+Below the results will be discussed and related work will be shown.
 
 \subsection{Results}
+The permissions of the Prefix Sum program have been verified, showing that the program is data race free. The specification is as compact as is reasonable and does not have special workarounds. This shows that parallel programs like the Prefix Sum can be proven data race free with VerCors and its specifications language.
 
-\todo{result description: verified}
+The functional specification has not been proven by VerCors, but an example version has been made to show a direction that could be taken to start the verification.
+
+During the specification and verification of the Prefix Sum program the tool VerCors has been improved using the feedback and issues provided during this project. Stefan Blom always answered quickly to solve problems in VerCors or provide information about usage of it, helping this project a lot.
 
 \subsection{Related work}
-\todo{similar verification projects}
+Most of the related work are simply the example provided by VerCors in the \code{/examples} directory on Github\footnote{\url{https://github.com/utwente-fmt/vercors}}. Most techniques used in the specifications of this project are shown in these examples (of which some are added in response to this project).
+
+The basics of VerCors are described in \cite{blom2014vercors}, which introduces the tool. The architecture and a couple more details are shown in \cite{amighi2012vercors}. Other verification projects have been done with VerCors, but most using Java instead of the PVL language.
 
 
 \section{Conclusion}
@@ -584,6 +579,15 @@ basicstyle={\scriptsize\ttfamily\color{codeText}}
 
 \subsection{Limitations and problems}
 \todo{tool limitations, change code for verification process}
+\subsubsection{Verification performance}
+\todo{Current performance, options and solutions for the future}
+\begin{enumerate}
+	\item Scaling with classes
+	\item Scaling with methods
+	\item Improvements in Z3
+	\item Better hardware
+	\item Better progress during verification
+\end{enumerate}
 
 \subsection{Research value}
 \todo{do larger programs, improve tool, concurrency}
