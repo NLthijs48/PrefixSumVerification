@@ -53,20 +53,12 @@ class Ref {
 				barrier(runThreads) {
 					context t>=0 && t<N;
 					context level>=1 && level<H;
-
-					// Ensure the result of the cells we give back permissions of
-					requires level-2>=0 ==> tree[level-1][t] == tree[level-2][t*2] + tree[level-2][t*2+1];
+					// Permissions
 					requires Perm(tree[level-1][t], write);
 					requires Perm(tree[level-1][t+N], write);
-
-					ensures (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], 1/2));
-					// Only the first half of threads
-					ensures t<N/4 ==> (\forall* int k; 0<=k && k<4; Perm(tree[level-1][t*4+k], 1/2));
-					// Ensure the value of the cells we get permission for
-					// Check if source values are not outside tree on the bottom and right side
-					ensures level-2>=0 && t*4+1<N ==> tree[level-1][t*2] == tree[level-2][t*4] + tree[level-2][t*4+1];
-					ensures level-2>=0 && t*4+3<N ==> tree[level-1][t*2+1] == tree[level-2][t*4+2] + tree[level-2][t*4+3];
-
+					ensures (\forall* int k; 0<=k && k<2; Perm(tree[level-1][t*2+k], write));
+					// Functional
+					ensures ((t+1)*2^level < N*2) => tree[level][t] == \sum([t*2^level ..(t+1)*2^level), input);
 				}
 				tree[level][t] = tree[level-1][t*2] + tree[level-1][t*2+1];
 			}
@@ -97,12 +89,14 @@ class Ref {
 				barrier(runThreads) {
 					context t>=0 && t<N;
 					context level>=0 && level<H;
-
+					// Permissions
 					requires Perm(tree[level][t*2], write);
 					requires Perm(tree[level][t*2+1], write);
-
 					ensures Perm(tree[level][t], write);
 					ensures Perm(tree[level][t+N], write);
+					// Functional
+					ensures (t*2^(level-1) < N*2) => tree[level-1][t*2] == \sum([0 ..t*2^(level-1)], input);
+					ensures (t*2^(level-1) < N*2) => tree[level-1][t*2+1] == \sum([0 ..t*2^(level-1)+1], input);
 				}
 			}
 
