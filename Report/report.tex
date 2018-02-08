@@ -127,17 +127,11 @@
 
 
 \section*{Abstract}
-This project continues the verification of a parallel Prefix Sum program. The program is intended for running on a GPU using OpenCL, the used algorithm is suitable for this purpose. The verification is done using Permissions-Based Separation Logic and PVL (toy language for verification purposes) to create a specification and VerCors to verify this specification. The Prefix Sum program has been proven data race free in this project. The result of the program has not yet been verified, but a specification has been made to start with this verification. During the project improvements have been made to VerCors by the author Stefan Blom to support this research and make future use easier.
+This project proves a parallel Prefix Sum algorithm data race free using VerCors. The used Prefix Sum program is intended for running on a GPU using OpenCL. The verification is done using Permissions Based Separation Logic and PVL (a toy language for verification purposes) to create a specification and VerCors to verify this specification. By specifying permissions the Prefix Sum program has been proven data race free in this project. This is a step towards verifying larger and more complex programs with VerCors, while identifying usability and performance problems in the tool. The results of the program has not yet been verified, but a specification has been made to start with this functional verification. During the project improvements have been made to VerCors by its developers to support this research and make future usage easier.
 
 
 \section*{Keywords}
 \textbf{VerCors, Permission-Based Separation Logic, GPU, OpenCL, verification, specification}
-
-
-\section*{Preface}
-This project is the continuation of my bachelor thesis project, in which the verification of the prefix sum algorithm has been started. Since only the 'data race free' part has been proven for the first part of the algorithm (the upsweep), the goal of this project is to prove the complete algorithm data race free, and additionally try to prove the functionality of the algorithm.
-
-The necessary background information will be included in this report to understand the goal and results of the project, but full details of the Bachelor project can be read in the paper of that project \cite{bachelorThesis}.
 
 
 \newpage
@@ -145,6 +139,8 @@ The necessary background information will be included in this report to understa
 
 
 \section{Introduction}
+This project is the continuation of my bachelor thesis project, in which the verification of the prefix sum algorithm has been started. Since only the 'data race free' part has been proven for the first part of the algorithm (the upsweep), the goal of this project is to prove the complete algorithm data race free, and additionally try to prove the functionality of the algorithm. The necessary background information will be included in this report to understand the goal and results of the project, but full details of the Bachelor project can be read in the paper of that project \cite{bachelorThesis}.
+
 This chapter describes the research domain, shows the problem that is solved, introduces the research questions and explains the approach.
 
 \subsection{Research domain}
@@ -155,7 +151,7 @@ A graphics processing unit (GPU) is a device designed to rapidly manipulate and 
 
 Running a parallel computation on a GPU brings a couple of challenges. The first challenge is preventing data races. A data race is the situation in a program where multiple threads are accessing the same memory location, with at least one of them writing to the location. The second challenge is verifying the correctness of the functionality of the program. Verifying both of these aspects is useful for safety critical systems.
 
-The previous research project has started with the verification process to show that a program (specifically the Prefix Sum algorithm) has no data races. Since only the first half of the program could be verified in the given time for the project the verification has been continued in this project.
+My Bachelor thesis research project made a start with the verification process to show that a program (specifically the Prefix Sum algorithm) has no data races. Since only the first half of the program could be verified in the given time for the project the verification has been continued in this project.
 
 \subsubsection{Prefix Sum}
 To show what the prefix sum is and how it is calculated, this section repeats the information from the previous project\cite{bachelorThesis} below.
@@ -177,7 +173,7 @@ The algorithm to calculate prefix sums can be structured in such a way that larg
 For the verification of the Prefix Sum program Permission-Based Separation Logic is used to specify the behavior of the program, and the tool VerCors is used to verify that the code matches the specification. A description of Permission-Based Separation Logic can be found in the previous project\cite{bachelorThesis}. 
 
 \subsection{Problem statement}
-Making sure a program has no data races, and always gives correct results is extremely hard, if not impossible with traditional testing. For a single-threaded application testing all inputs should prove that the program is correct, but for multi-threaded applications this does not prove anything about data races. In order to verify the correctness of a program it has to be specified in Permission-Based Separation Logic, which is a challenge for bigger programs like the Prefix Sum. VerCors, the tool used to verify the specification, will get slower when a larger specification is used. This makes using the tool correctly and efficiently a challenge. During the previous project a number of problems in the tools have been identified that blocked the verification, during this project this will be the case as well.
+Making sure a program has no data races, and always gives correct results is extremely hard, if not impossible with traditional testing. For a single-threaded application testing all inputs should prove that the program is correct, but for multi-threaded applications this does not prove anything about data races. In order to verify the correctness of a program it could be specified in Permission-Based Separation Logic, which is a challenge for bigger programs like the Prefix Sum. VerCors, the tool used to verify the specification, will get slower when a larger specification is used. This makes using the tool correctly and efficiently a challenge. During the previous project a number of problems in the tools have been identified that blocked the verification, during this project this will be the case as well.
 
 \subsection{Research questions}
 The following research questions have been formed from the problem statement:
@@ -187,12 +183,12 @@ The following research questions have been formed from the problem statement:
 	\item What are the limitations of VerCors for verifying GPU programs?
 \end{enumerate}
 
-The first research question has partially been proven by the previous research, which will be used as a starting point. To answer it fully the specification of the Prefix Sum algorithm has to be extended to the complete program (add the downsweep and final permissions). For the second research question the specification created for the first question has to be extended with information about the results. The third question is to review the VerCors tool, which will be done during the verification process of the first two questions.
+The first research question has partially been proven by the previous research, which will be used as a starting point. To answer it fully the specification of the Prefix Sum algorithm has to be extended to the complete program (add the downsweep permissions, ensures clauses for the threads and the ensures clauses of the kernel). For the second research question the specification created for the first question has to be extended with information about the results. The third question is to review the VerCors tool, which will be done during the verification process of the first two questions.
 
 \subsection{Approach}
-First the last specification of the previous project will be tested in the last version of VerCors, to ensure it still works after all changes in tool. After that works, the verification of the read/write permissions can be continued for the downsweep phase of the program. I expect that the specification should not be hard, because it uses much of the same patterns of the upsweep phase, but getting VerCors to actually verify it will take time. After the downsweep phase is specified and verified, the \code{ensures} clause of the complete program can be added, which might give some trouble to proof as well. While adding more specifications I expect the verification time to increase. Hopefully this does rise to a time that makes iterating through different versions of the specification too slow.
+First the last specification of the previous project will be tested in the last version of VerCors, to ensure it still works after all changes in the tool. After that works, the verification of the read/write permissions can be continued for the downsweep phase of the program. I expect that the specification should not be hard, because it uses much of the same patterns of the upsweep phase, but getting VerCors to actually verify it will take time. After the downsweep phase is specified and verified, the \code{ensures} clause of the complete program can be added, which might give some trouble to proof as well. While adding more specifications I expect the verification time to increase.
 
-After the read/write permissions have been verified, the functional specification and verification can be started. To speed up this process it is probably best to remove the downsweep phase at first, and just start with the upsweep phase. This will keep the iteration time low and should make it easy to rapidly expand the specification. Doing the verification of the downsweep phase might get slow due to the verification time of VerCors. Adding the final ensures for the complete program might be the hardest task, since the everything needs to be enabled at that point.
+After the read/write permissions have been verified, the functional specification and verification can be started. To speed up this process it is probably best to remove the downsweep phase at first, and just start with the upsweep phase. This will keep the iteration time low and should make it easy to rapidly expand the specification. Doing the verification of the downsweep phase might get slow due to the verification time of VerCors. Adding the final ensures for the complete program might be the hardest task, since everything needs to be enabled at that point.
 
 To answer the third research question notes will be made during the verification process to keep track of tool improvements and limitations. These will be written down to provide future work for the tool, or notes for creating specifications that are supported by VerCors.
 
@@ -214,7 +210,7 @@ for a := 1 to n do
 	result[a] := input[a-1] + result[a-1]
 \end{lstlisting}
 
-The algorithm implemented for this research is made by Blelloch \cite{Blelloch:PrefixSum}, and can be used concurrently. The description of Nguyen \cite{Nguyen:GPUGems3} has been followed to implement the algorithm. The \emph{Simple-OpenCL} library \cite{Huguet:SimpleCL} of O. A. Huguet and C. G. Marin has been used to implement the OpenCL kernels. The algorithm by Blelloch performs the Prefix Sum calculation in two phases, the up-sweep phase and down-sweep phase. The algorithm uses a balanced binary tree for data storage, therefore a tree with $log_2(n)$+1 levels is required to accommodate for an input of size \emph{n}. If the input size is not a power of 2, then the input will be padded with zeros until it is; this is necessary because the algorithm requires a binary tree. The tree has $d=log_2(n)$+1 levels, and each level $d$ has $2^d$ nodes. At the start the input values will be placed in the \emph{n} leaves at the bottom of the tree, see Figure~\ref{treeStart}. The up-sweep phase traverses the tree from the leaves to the root, level by level, and computes partial sums in the nodes of the tree. At each level the sum of 2 nodes is computed and placed in the node above, at the end the root node contains the sum of all elements in the input. Figure~\ref{treeUpSweep} shows the end result of this phase.
+The algorithm implemented for this research is made by Blelloch \cite{Blelloch:PrefixSumApplicationsm}, and can be used concurrently. The description of Nguyen \cite{Nguyen:GPUGems3} has been followed to implement the algorithm. The \emph{Simple-OpenCL} library \cite{Huguet:SimpleCL} of O. A. Huguet and C. G. Marin has been used to implement the OpenCL kernels. The algorithm by Blelloch performs the Prefix Sum calculation in two phases, the up-sweep phase and down-sweep phase. The algorithm uses a balanced binary tree for data storage, therefore a tree with $log_2(n)$+1 levels is required to accommodate for an input of size \emph{n}. If the input size is not a power of 2, then the input will be padded with zeros until it is; this is necessary because the algorithm requires a binary tree. The tree has $d=log_2(n)$+1 levels, and each level $d$ has $2^d$ nodes. At the start the input values will be placed in the \emph{n} leaves at the bottom of the tree, see Figure~\ref{treeStart}. The up-sweep phase traverses the tree from the leaves to the root, level by level, and computes partial sums in the nodes of the tree. At each level the sum of 2 nodes is computed and placed in the node above, at the end the root node contains the sum of all elements in the input. Figure~\ref{treeUpSweep} shows the end result of this phase.
 
 \begin{figure}[htb!]
 	\centering
@@ -282,9 +278,26 @@ for d=`$log_2$`(n)-1 to 1 do
 This chapter describes the process of verifying the read/write permissions of the Prefix Sum program. It starts with the result of the previous research, expands it to the downsweep phase, after which the specification is simplified.
 
 \subsection{Starting point}
-Listing \ref{specification:previous} shows the specification as was made during the previous project. This specification has been verified until the end of the upsweep phase. The specification of the downsweep phase has been written down, as well as the ensures for the complete program, but these could not be verified by VerCors yet at that time.
+Listing \ref{specification:previous} shows the specification as was made during the previous project. This specification has been verified until the end of the upsweep phase. The specification of the downsweep phase has been written down, but could not yet be verified by VerCors because it was not 100\% correct and complete. The specification was missing verification of the permissions required to start the downsweep phase, and was quite verbose.
 
-This specification is a good starting point for completing the read/write permissions verification. The process of extending this specification is described in the next section.
+The specification starts with a class definition. Inside this class definition there is one method, called \code{prefixSum}. This method will do the prefix sum algorithm on the provided input. The method has a couple parameters, these have the following purpose:
+\begin{enumerate}
+	\item \textbf{N}: The size of the input (must be a power of two)
+	\item \textbf{H}: $log2(N)+1$, the height of the temporary array
+	\item \textbf{input}: Array of size \code{N}, containing the input numbers
+	\item \textbf{output}: Array of size \code{N}, meant for the result of the algorithm
+	\item \textbf{tree}: Two-dimensional array of size \code{N*H}, used during the computation
+\end{enumerate}
+
+The output and tree array are explicitly given as parameters to the method, since in OpenCL the host (CPU program) would declare the required memory blocks, which get used in the GPU kernel. The kernel method has a couple of conditions, starting with static numbers for \code{N} and \code{H}. These are declared like this because VerCors can not handle declaring that \code{N} should be a power of two, and \code{H} needs to be $log2(N)+1$. After this permissions to the complete input, tree and output arrays are given to the method.
+
+Next at line 19 a \code{par} block is used to declare that the following code will run in parallel on multiple threads, like a GPU does. This block specifies how many threads are used, and provides the \code{t} variable to reference the number of the current thread. \code{requires} and \code{ensures} conditions in the \code{par} block declare which permissions are assigned to each thread.
+
+Now the code for each thread is specified. It starts by copying the input values to the bottom of the tree array. After that the upsweep starts. The \code{loop\_invariants} declare the permission layout of the tree array, and how it changes while going through the loop. Inside the loop there is a barrier at line 56. This barrier ensures that all GPU threads synchronize, making sure all previous code is executed on all threads. The barrier changes the permissions layout of the tree array, ensuring it is ready for the next row.
+
+Before the downsweep starts, the top row of the tree array is set to zero. After that the loop of the downsweep is listed. The specifications at lines 76 until 105 are not verified by the tool, but were the best guess as done in the Bachelor project.
+
+This specification is a starting point for completing the read/write permissions verification. The process of extending this specification is described in the next section.
 
 \lstinputlisting[
 	caption={
@@ -366,16 +379,16 @@ A similar merge was required for the downsweep barrier, in this case two require
 The first iteration of the downsweep has been extracted from the while loop. This was necessary because the permission layout of the tree array was already correct for the first iteration, so doing a barrier was not necessary yet. Extracting this first iteration leads to code duplication for the downsweep operation, which will be addressed in later specification versions. This change also meant updating the loop\_invariant of the downsweep while loop, the \code{level<i} has been replaced with \code{level<=i} in the loop\_invariant that describes the write permissions of the temp array of all rows except the bottom one.
 
 \textbf{Array definition workaround}\\
-VerCors did not properly recognize the length of the array through the specification, and could sometimes not know that each specified array cell is unique. A workaround for this problem has been provided by Stefan Blom. By adding \code{tree != null} the tools handles array lengths correctly and knows its cells are unique. Hopefully this workaround can be removed in the future.
+VerCors did not properly recognize the length of the array through the specification, and could sometimes not know that each specified array cell is unique. A workaround for this problem has been provided by Stefan Blom. By adding \code{tree != null} the tools handles array lengths correctly and knows its cells are unique. Note that this workaround has been removed already, the next section will show a simplified specification where this issue is solved.
 
 \textbf{Assert statements}\\
 The VerCors tools could not get through the while loops correctly anymore after some updates, the underlying problem is in the external library Z3. This problem has been solved by adding \code{assert <condition>} statements just before and inside the barrier, and by using identity operators in some places. These statements force the tools to prove a certain condition at that point, which provides provides search options into the right direction (where previously the tools would run out of options). At the end the specification works, but got bigger with assert statements and has added complexity with identity operators \code{id(0)} and \code{id(1)}.
 
 \textbf{Simplification failures}\\
-A couple of "simplification failure" errors have been encountered during the verification process. This happens when a \code{\\forall*} cannot be transformed to a rule that the internal prover accepts. Transformations like these happen with simple matching rules, that replace certain parts with others. For example a simplification failed at some point when instead of writing \code{0<=i \&\& i<N}, I wrote \code{i>=0 \&\& i<N}. These expressions mean the same exact thing, but the rules only match the first variant. These kind of problems would really need to be solved before VerCors can be used by anyone to verify their programs.
+A couple of "simplification failure" errors have been encountered during the verification process. This happens when a \code{\textbackslash forall*} cannot be transformed to a rule that the internal prover accepts. VerCors provides a language that is easy for the user, but internally the used prover tools only accept a more restrict set of specifications. This means that the specification gets transformed by VerCors into a format that the used prover tools understands. If this transformation cannot find a correct translation, a "simplifications failure" error message is shown. Transformations like these happen with simple matching rules, that replace certain parts with others. For example a simplification failed at some point when instead of writing \code{0<=i \&\& i<N}, I wrote \code{i>=0 \&\& i<N}. These expressions mean the same exact thing, but the rules only match the first variant. These kind of problems would really need to be solved before VerCors can be used by anyone to verify their programs.
 
 \textbf{Cleanup}\\
-Inside the barrier of the upsweep there was an unnecessary ensures clause, which has been removed: \code{ensures Perm(tree[level][t], write));}.
+Inside the barrier of the upsweep there was an unnecessary ensures clause, which has been removed: \code{ensures Perm(tree[level][t], write));}. This clause was not necessary because the permissions that a barrier does not mention, are assumed to be kept. So only the permission changes need to be in the clauses. The \code{loop\_invariant} of the loop will ensure the other permissions are still available in the next iteration.
 Additionally the ensures clause of the complete program has been simplified, it does not have a separate clause for the bottom row of the tree array anymore. The split clauses were not necessary, since the program simply has write permissions to all locations in the tree array, so it is pointless to split among multiple clauses.
 
 \textbf{Verification time}\\
@@ -394,7 +407,7 @@ After the changes described above the specification is complete and verifies in 
 ]{specifications/basic.pvl}
 
 \subsection{Specification simplification}
-After finishing the specification for the array permissions, it felt like it was too verbose. The first problem is that a lot of clauses start with \code{t<(N/2)}, and most code blocks are also have the same condition. This condition disables the last half of the threads that are used in the kernel. Actually these threads are not useful at all and normally would not be used for the execution. The only reason the number of threads is double than necessary is that VerCors could not handle the correct number of threads at first. The syntax of specifying a GPU kernel program was different, and did not allow to easily use half the number of threads, and arrays did not accept expressions inside their declaration. Later the syntax updated based on the Java language syntax, so it basically is just a class with a method inside. So now it is possible to make a specification with half the number of threads, so that the result is a lot more compact and readable. The resulting specification will be discussed below.
+After finishing the specification for the array permissions, it felt like it was too verbose. The first problem is that a lot of clauses start with \code{t<(N/2)}, and most code blocks also have the same condition. This condition disables the last half of the threads that are used in the kernel. Actually these threads are not useful at all and normally would not be used for the execution. The only reason the number of threads is twice than necessary is that VerCors could not handle the correct number of threads at first. The syntax of specifying a GPU kernel program was different, and did not allow to easily use half the number of threads, and arrays did not accept expressions inside their declaration. Later the syntax updated based on the Java language syntax, so it basically is just a class with a method inside. So now it is possible to make a specification with half the number of threads, so that the result is a lot more compact and readable. The resulting specification will be discussed below.
 
 \subsubsection{Half the number of threads}
 To half the number of threads the \code{N==32} clause has been changed to \code{N==16}. The \code{par} block that specifies the number of threads uses the N directly, so the number of threads is now correctly halved. The input, output and tree array specifications are changed to use $N*2$ as size, because they should stay the same size as before. All of the $t<(N/2) ==>$ constructs have been removed, those are not necessary anymore.
@@ -440,15 +453,17 @@ Finally because the permissions of the last row have changed, copying the result
 To be able to use indexing in the form of $t$ and $t+N$ VerCors has been updated by Stefan Blom, this allowed this specification to work.
 
 \subsubsection{Compacting: invariant and context keywords}
-In the previous specification the clause \code{N==32 \&\& H==6} was repeated constantly, in each loop and barrier. To prevent this kind of repetition the \code{invariant} keyword is now available on the program level, so that specifying constants is only needed once. This cleans up a lot of clauses, making the specification easier to read and understand.
+In the previous specification the clause \code{N==32 \&\& H==6} was repeated constantly, in each loop and barrier. To prevent this kind of repetition the \code{invariant} keyword is now available on the program level, so that specifying constants is only needed once. This invariant on the kernel level requires and ensures the given condition through the complete program, including loops. This cleans up a lot of clauses, making the specification easier to read and understand.
 
 Another pattern that is common in the previous specification is that a clause in the requires and ensures is the same. For example the barrier would repeat a condition of the loop\_invariant as a require and ensure, duplicating this specification. This has been solved by Stefan Blom by adding the \code{context} keyword in VerCors, which acts as a require and ensure at the same time. This compacted the specification of the barriers a bit, for the constraints of the thread number and the level.
+
+The above changes do not change the actual verification at all, since these options are simple syntactic sugar. They do however improve the user experience of VerCors a lot, keeping the specification a lot more readable.
 
 \subsubsection{Cleanup: \textbackslash matrix and \textbackslash array}
 The previous specification contains a bunch of \code{tree != null} clauses, which were used as a way to ensure certain properties about the used arrays. This was a temporary workaround, which now has a permanent solution with \code{\textbackslash array} and \code{\textbackslash matrix} as replacements. In the specification \code{\textbackslash matrix(tree,H,N*2)} is used to indicate that \code{tree} is a two-dimensional array (also called matrix) with dimensions \code{H} by \code{N*2}. This information is used through the specification by VerCors to know the dimension of the array and other standard array properties. For the input and output array \code{\textbackslash array(input,N*2)} is used, specifying an array with one dimension. These changes mean that all \code{tree != null} clauses have been cleaned up, and make it more obvious what the inputs are. The workaround with \code{id(0)} and \code{id(1)} has also been removed, this is not necessary anymore because of improvements in VerCors.
 
 \subsubsection{Result}
-With the changes described above the specification has become smaller, easier to read, and with less workarounds.
+With the changes described above the specification has become smaller, easier to read, and with less workarounds. Sadly the verification time has increased to 36 minutes for the complete specification on my machine (Intel i7-4770K), making it painful to do modifications. Turning off the ensure clauses of the kernel and thread block will get the verification time back to 1 minute and 30 seconds, which is can be worked with.
 
 \subsection{Result}
 After first verifying a straightforward version of the permissions using a verbose specification, a compact version has been made. This last version is a nice and compact verification of the permissions (and therefore absence of data races) of the Prefix Sum, which can serve as a starting point for verifying the functionality. The next step is to find out the changes necessary for the functional verification, which is discussed in the next chapter.
@@ -504,7 +519,7 @@ During the upsweep the tree array will be updated to contain partial sums of the
 loop_invariant level>0 ==> tree[level][t] == tree[level-1][t*2] + tree[level-1][t*2+1];
 \end{lstlisting}
 
-Currently I'm not sure this is enough to let VerCors proof the end condition, but it should be a good start. It might need to already know that each cell is the sum of a certain range of values from the bottom row of the tree array, which might look like shown in Listing \ref{listing:functionalStepUpSweepSum}. One problem is that threads do not have access to all cells at the lower row of the tree array, so this condition would lead to permissions errors. Instead the input array might be used, but I'm unsure if this can be proven using VerCors. 
+Currently I'm not sure this is enough to let VerCors proof the end condition, but it should be a good start. It might need to already know that each cell is the sum of a certain range of values from the bottom row of the tree array, which might look like shown in Listing \ref{listing:functionalStepUpsweepSum}. One problem is that threads do not have access to all cells at the lower row of the tree array, so this condition would lead to permissions errors. Instead the input array might be used, but I'm unsure if this can be proven using VerCors. 
 
 The precondition is necessary because not all threads will have complete results at all levels, as shown earlier the higher rows in the tree array have some dummy values, to increase performance.
 
@@ -520,7 +535,7 @@ loop_invariant tree[H-1][t] == 0;
 \end{lstlisting}
 
 \subsubsection{Step 4: downsweep results} 
-The next clause should be about the results of the computation of the downsweep loop. Listing \ref{listing:functionalStepDownsweep} shows conditions that could be added to verify this result. The first condition specifies that a value from level has been copied to a level below, at twice the thread index. This computation takes the value from a node in the binary tree, and assigns it to its left child. The right child has a different computation, it is set to the sum of the left child and the parent. Because the left child is also updated by the previous computation, the \code{\textbackslash old} function is put around the value of the left child in the specification.
+The next clause should be about the results of the computation of the downsweep loop. Listing \ref{listing:functionalStepDownsweep} shows conditions that could be added to verify this result. The first condition specifies that a value from the current level has been copied to a level below, at twice the thread index. This computation takes the value from a node in the binary tree, and assigns it to its left child. The right child has a different computation, it is set to the sum of the left child and the parent. Because the left child is also updated by the previous computation, the \code{\textbackslash old} function is put around the value of the left child in the specification.
 
 \begin{lstlisting}[caption=Downsweep results loop\_invariant, label=listing:functionalStepDownsweep, float=htpb]
 loop_invariant tree[level-1][t*2+1] = \old(tree[level-1][t*2]) + tree[level][t];
@@ -587,6 +602,8 @@ A second problem is the performance of VerCors. The tool will run longer when th
 	\end{tabular}
 	\label{table:runTimes}
 \end{table*}
+
+A lot of verification time is added when adding the ensure clauses of the kernel and thread blocks. This time seems unreasonably long, since it is basically proving that the final condition of the downsweep loop matches the ensures clause. This step does add almost 30 minutes to the verification time. And after that it needs to combine the permissions of the individual threads together (which adds ~4 minutes to the verification). Hopefully with some debugging of VerCors it is possible to find out why these last steps take that long, to eventually solve this issue.
 
 There are some possibilities for improving the performance of VerCors. A first issue is that only one core is used for the verification, while modern systems usually at least have 4. When verifying programs with multiple methods VerCors can use multiple cores, but in this case it is just one method. Different classes can also be verified in parallel, so verifying a program consisting of multiple classes can be speed up by having a system with a good multi-core processor. To improve the verification times of a single method, the underlying proving libraries like Z3 could be improved. Or the translated specification that VerCors produces and passes to the underlying prover could be improved. It is however not likely that VerCors will ever be able to work linearly depending on the number of if/while conditions, since each such a condition simply introduces a lot more options. The fact that this program is a GPU kernel, which basically has a sort of loop for all threads makes the verification complexity higher, causing longer run times. Regular Java programs will have quicker verification because the additional thread loop is absent.
 
