@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+	<html class="sl-root decks export offline loaded">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Parallel Prefix Sum Verification with VerCors</title>
+
+		<meta name="description" content="Parallel Prefix Sum Verification with VerCors">
+
+		<link rel="stylesheet" type="text/css" href="lib/offline-v2.css">
+
+
+
+	</head>
+	<body class="reveal-viewport theme-font-merriweather theme-color-silver-green">
+		<div class="reveal">
+			<div class="slides">
+				<section data-id="43aa1ff0d59ca60a1e8fe26d2955ab54" data-background-color="#25ae43"><div class="sl-block" data-block-type="text" style="width: 1251px; left: 15px; top: 89px; height: auto;" data-block-id="dee7ffca75165b9acf4c5bd49e4d6dd2"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;">
+<h1>Verification of the</h1>
+
+<h1>Parallel Prefix Sum</h1>
+
+<h1>with VerCors</h1>
+</div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 808px; left: 236px; top: 472px;" data-block-id="09213e3293937c20c441a6c26052f31f"><div class="sl-block-style" style="z-index: 12; opacity: 0.7;"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 12; color: rgb(255, 255, 255); font-size: 166%;">
+<p>Thijs Wiefferink (s1366564)</p>
+</div></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 600px; left: 340px; top: 544px;" data-block-id="7a9259c007cb15c54316a4ad9c641978"><div class="sl-block-style" style="z-index: 13; opacity: 0.7;"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 13; color: rgb(255, 255, 255); font-size: 166%;">
+<p>Capita Selecta MTV</p>
+</div></div></div></section><section data-id="2123706c73a3a5674dbbe98cdec42e26"><div class="sl-block" data-block-type="text" style="width: 1063px; left: 109px; top: 35px; height: auto;" data-block-id="01f5500d3a82130eb121a514d2f892ac"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255); text-align: center;">
+<h2>Verification</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -284px; top: -64px;" data-block-id="63cca547162fa3800c44606cd5413416"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 1578px; height: 989px; left: -136px; top: -224px;" data-block-id="7b70586c609a0a895af602ad89681e71"><div class="sl-block-content" style="z-index: 10;"><img style="" data-natural-width="2015" data-natural-height="1263" data-lazy-loaded="" data-src="prefixsumverification/cd60a327cf3491b62f95ce1b12a718d8.png"></div></div></section><section data-id="4aec302b898e34e49ef06470b8a3c8a8"><div class="sl-block" data-block-type="text" style="width: 1063px; left: 115px; top: 43px; height: auto;" data-block-id="00039ac88dd9164044527f20dfe6aecf"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Verification</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -284px; top: -64px;" data-block-id="140cb7ed070b91da9b3a3025cf9b244a"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 1600px; height: 1000px; left: -153px; top: -248px;" data-block-id="45afdf411086f5e734ad2d5ac6d82c37"><div class="sl-block-content" style="z-index: 10;"><img style="" data-natural-width="2010" data-natural-height="1256" data-lazy-loaded="" data-src="prefixsumverification/f02f956aed6a8bac70f5ac59d31f70cd.png"></div></div></section><section data-id="d8002923c85feb3a3b18b0a4d68d82c4"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="c4f7ae18557f50b31b40768893b992a4"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Prefix Sum</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -284px; top: -64px;" data-block-id="c13ac3384595b83d5ed0175748ccff17"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 1135px; height: 288px; left: 73px; top: 253px;" data-block-id="a16c9e3d204044fdbba3e5b395f6dc5e"><div class="sl-block-content" style="z-index: 13;"><img style="" data-natural-width="2187" data-natural-height="555" data-lazy-loaded="" data-src="prefixsumverification/7d7f7003e6e99512bd36aa888a18c07d.png"></div></div></section><section data-id="33cd5cbd07f100cf84535141db7d6216"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="f21550f1b307199f48f504d8c0592c96"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the CPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="b6f7165cd9b5b697589adb130d95e973"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="width: 1135px; height: 288px; left: 73px; top: 253px;" data-block-id="eabddc55e2028beefb91124cc92f0a98"><div class="sl-block-content" style="z-index: 13;"><img style="" data-natural-width="2187" data-natural-height="555" data-lazy-loaded="" data-src="prefixsumverification/7d7f7003e6e99512bd36aa888a18c07d.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="d89cbe3825d4997b5e3d7ea84dd419a0"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section class="stack" data-id="66081d48b49b259fcc7aa97a7dfd1809"><section data-id="806bbc287ba861d4e5285a211410c00b"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="c329bc5f5c9001bc504d07cb592fc918"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="1f7407cbb5beb20600d4c96733bfa49f"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 869px; height: 418px; left: 206px; top: 239px;" data-block-id="e3874b7d37a3b43861324f772e38c893"><div class="sl-block-content" style="z-index: 13;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/ca6b4c03a20e77cea82dca99af0e3a6f.png"></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="053b21adbeaa747c9edf34c3f6c42995"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Starting situation</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="eb565429e25eb84cca62070d67273bec"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="782597e2a8bff15e55e030f93914e6a5"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="2158201d7c619651ac101f92d03dd7a8"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="539b241f633659d2523297a57a994655"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="3f1936466da1659fd3086d73dd486537"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>First upsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 798px; height: 384px; left: 241px; top: 264px;" data-block-id="f6e7ae11b402ed8bb3c3adf9fb16e50e"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/12aba1f9b292d69da57dffd5153084bb.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="2a0545f3a808aa53bec2ed52b8cb5253"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="b89621b25292231652c9081ce4f0f47a"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="247b4726143572104886f60441fd6aad"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="9a697e7f2a6ab39dca972844b06ba6bb"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="7ca0b42ce279540517dec864fb5b3a70"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Second upsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 792px; height: 381px; left: 244px; top: 267px;" data-block-id="e7dfe2dc038d0d599c4c1495847c624b"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/57b1ebaec585cded7917d4b3f26927b2.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="cccacb015872a6cea91560ed3f57554e"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="2921ba76083c13c5a5349e65b2c7a8d2"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="9f5d1f56fef0294a1bf6b8d7fae48165"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="767b7d686715e6d975d1e0e8e66f6812"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="afb8c1dd5679f188b728ace745ed0b7a"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Third upsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 817px; height: 393px; left: 232px; top: 255px;" data-block-id="d4df1923cc3f5c5dd5f67dedeb5d52b5"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/035143de7b1640bf2180046953061746.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="772999c19d45a857848812d68a842263"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="b9d0f5dd903a9556f668a00400c3afe6"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="bdc1eab12b354fa2d2af0e3b709449a5"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="94e1837627fe0d4fd12169239b2a3294"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="ed9bea24db11665ba0efab5464b53fcc"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>First downsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 836px; height: 401px; left: 222px; top: 247px;" data-block-id="436f31fa2b7b661106a15671a4acd35c"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/d39095475411b11765714c7b463d77a2.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="07224fe3756280a05c41e3959e8b091a"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="fa868908144cfd6d14b5a778ab46b2a0"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="16be46bd98e32a924d5e3bba0c64ec2e"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="9cf339582095635cf5b61e7c7c995e33"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="6274ec3b93fa0bf75c9efab1983267df"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Second downsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 828px; height: 397px; left: 226px; top: 251px;" data-block-id="139c4a43ab12e9a43e65d70cd2298a4f"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/e5cf6a394f7b9428670a940152fa055e.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="e99ad39c49a5c329081dc36faa5156be"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="4ba8236330a7a4e9ee8382428434cc6d"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="f8bc690e5a76307fac85bb4990ac5ad9"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="d6464f7b77f7be47472c17a5b75c6117"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="d6011f41dc162e5525e180aebb9c4b01"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Third downsweep row</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 826px; height: 396px; left: 227px; top: 252px;" data-block-id="fd89336d5de42ea24683fa1608b11d75"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/19b85b892022ee413f9c4cecab66e493.png"></div></div>
+<div class="sl-block" data-block-type="shape" style="min-width: 4px; min-height: 4px; width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="25f96d6b54baf6be86cc46a158366a54"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div></section><section data-id="185150f9a89573d7f20fde40e9097864"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="97c9bcc043b9fd45087daadecee1f6b9"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Calculate Prefix Sum on the GPU</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="fc71efcec42a8f53cf966fd7cae929bf"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="c07664f10b2d445f62f449182d027aa2"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2><strong>Result</strong></h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="a64b1b46952330ba85c22094c1d31db7"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 818px; height: 390px; left: 231px; top: 258px;" data-block-id="47767a2b53d5414f759fc7c4dcc7f37f"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="638" data-natural-height="304" data-lazy-loaded="" data-src="prefixsumverification/af947846c09a7669cb0403c81fd43531.png"></div></div></section></section><section class="stack" data-id="c1c2c52cc759718611b4be5b5b7e9557"><section data-id="dcffa2b75d38e018d25931e204bc4630"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="b46314aa4639b1572e35d5c26672aae1"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="8304e86586e9ef38b2946c7b6a3f9774"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="20c43abe5271ceed13e9a1a6d5e3f40a"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Starting point</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="cab5fc1eeab963c61b7b1ae5c94e943c"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 590px; height: 283px; left: 656px; top: 365px;" data-block-id="a9cc1680941206fecf513043c94d116c"><div class="sl-block-content fragment" style="z-index: 15;" data-fragment-index="0"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/075e1e28ebf0238bb378569a1768346c.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 584px; height: 304px; left: 0px; top: 379px;" data-block-id="3682009b1ed5f47a13803ff1dfff2098"><div class="sl-block-style" style="z-index: 16;"><div class="sl-block-content fragment" style="z-index: 16;" data-fragment-index="0"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/6f688a79f522ac83738c453b07d3baef.png"></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 554px; height: 60px; left: 667px; top: 238px;" data-block-id="d5ca89e55e310ffd1c8608297d070f19"><div class="sl-block-content" style="z-index: 17;"><img style="" data-natural-width="1911" data-natural-height="207" data-lazy-loaded="" data-src="prefixsumverification/49270285545ed083f6a943454ed6b887.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 516px; height: 109px; left: 68px; top: 233px;" data-block-id="bec7db1022aba25c2e333313804df654"><div class="sl-block-content" style="z-index: 18;"><img style="" data-natural-width="1449" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/e8a6f13a66783c42fca5cc4085757bcb.png"></div></div></section><section data-id="94240aba8ddc528df463300db1871b4a"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="2639a928e2922fe7323c1d4eaea6ddf9"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="7e7e139437a3bc8f35cbeeb7ffde9bb2"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="20a0fbbb52330c03fcddc03d294c8ff5"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>After the first upsweep step</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="22e070706e9b8299c48dc6b4e44cdc8a"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 576px; height: 277px; left: 683px; top: 262px;" data-block-id="e6e15c70e463ec20aadf15bb73f6bbac"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/12aba1f9b292d69da57dffd5153084bb.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 607px; height: 316px; left: 0px; top: 262px;" data-block-id="0988f1abfa1144ffdd7fe49e21c80847"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/546a5db8fa7cb90d0ed029650f555440.png"></div></div></section><section data-id="ef8d2a98cacdd1961b02e91f43c46eb9"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="05d9108bcdd3315164dcdb3bf686e62d"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="67cdebac45526755eb5d7b075e0d7204"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="89ea324a5d99f8d5fda485f1e4b7ebd3"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>After the second upsweep step</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="524642c5ef41e1fc8485b88486286788"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 609px; height: 317px; left: 0px; top: 288px;" data-block-id="99b49f13181772908974bf32d74be1f4"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/04ccfef51b6de075c350dcb13a87141c.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 571px; height: 275px; left: 665px; top: 288px;" data-block-id="bb6be11d072a4c070e21af239599b52c"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/57b1ebaec585cded7917d4b3f26927b2.png"></div></div></section><section data-id="a62928a3b61081eb6bb4eba735f26e75"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="6ab902b1599dde9f925e40314d117709"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="3a6003065b4ae3702eaa2c742af0a9a5"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="0552a9a0d4fcc8940394c923ef0442de"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Upsweep complete</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="0ea5eae19f1b22b8a822fc2cb36e1853"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 588px; height: 283px; left: 647px; top: 268px;" data-block-id="c223c676932817e16df2cb68bb156ca8"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="638" data-natural-height="307" data-lazy-loaded="" data-src="prefixsumverification/035143de7b1640bf2180046953061746.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 590px; height: 307px; left: 0px; top: 279px;" data-block-id="7053adb7538fd8e070a5107a1317b84e"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/0911a95892e1f2383ea99a9d874ad0b8.png"></div></div></section><section data-id="729c41b1b794d4ec137518938439309d"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="16f3aed3cc86940c316215851815edc2"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="2aaaffcac363097a5d47d3cef17214c5"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="4b142edb525f14fe1920bd304e9e4350"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>First step of the downsweep</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="f18607b6f056bc456abb3ac95443a3ea"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 559px; height: 268px; left: 670px; top: 279px;" data-block-id="65a5f9841bcde0a02062c092270ca2bf"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/d39095475411b11765714c7b463d77a2.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 609px; height: 317px; left: 0px; top: 279px;" data-block-id="e4e39aaf36746deb780fb65a0216f1d6"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/04ccfef51b6de075c350dcb13a87141c.png"></div></div></section><section data-id="adc468dc1a899e2e6a2b2d12d6274b3f"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="e96a16e900acf3b6a854d77a3851ab8a"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="a546cb878c3c4c722cbe0d3b65ce453a"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="2e4e9e0ec0e87909418f39836143ae8e"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Second step of the downsweep</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="6e9c2f8ad4b02fb84bfbadb60889290b"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 584px; height: 280px; left: 674px; top: 279px;" data-block-id="6284238c6bbd1dd55623f6709431faf9"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/e5cf6a394f7b9428670a940152fa055e.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 609px; height: 317px; left: 0px; top: 279px;" data-block-id="24a102016b129f28a9ff9737aab48a03"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/66b4c38cba1da54beab1c1c6347f5946.png"></div></div></section><section data-id="728eba44ad6907fe8043fcac31733616"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="07a8c0ed93dcbdafe28351fffcd25a27"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="dce93d1e8714115977d3e5c45f5a32e4"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="c1c4a9a61b89fe21d58f7333842bbea2"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Final step of the downsweep</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="f1fc4d39f593a84b8eab085d35381584"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 604px; height: 314px; left: 0px; top: 275px;" data-block-id="acc85bfbf350a959b5fa55f652382053"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/7e58e1ad7e1f927230256a9e247c1a48.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 575px; height: 276px; left: 673px; top: 275px;" data-block-id="856e2698ae6747a15844b2c51c256c13"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="638" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/19b85b892022ee413f9c4cecab66e493.png"></div></div></section><section data-id="c1abd936b3059b0c5b1bb8c32a212ffc"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="446c4f75649f4b43ca417073362f4d8e"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Verification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="47b22586aeb4ad56408681c26b34df58"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="d4f552f4e1f0995a917fdcc3c3d01632"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Copy to output</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="4252ddb5ae67af507d6e39a77801bfb9"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="width: 560px; height: 291px; left: 18px; top: 228px;" data-block-id="17b8a459713ce30a433bbcbc788edcbf"><div class="sl-block-content" style="z-index: 15;"><img style="" data-natural-width="1626" data-natural-height="846" data-lazy-loaded="" data-src="prefixsumverification/7e58e1ad7e1f927230256a9e247c1a48.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 537px; height: 256px; left: 692px; top: 228px;" data-block-id="7bd452aefec66ae014780a000ef96459"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="638" data-natural-height="304" data-lazy-loaded="" data-src="prefixsumverification/af947846c09a7669cb0403c81fd43531.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 544px; height: 59px; left: 685px; top: 579px;" data-block-id="85effddcd03c341dec07dbfce19de6b2"><div class="sl-block-content" style="z-index: 17;"><img style="" data-natural-width="1911" data-natural-height="207" data-lazy-loaded="" data-src="prefixsumverification/8bee19fb39f545d2149e789318a1bbd0.png"></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 502px; height: 106px; left: 80px; top: 576px;" data-block-id="be2369776f4350594e2d8d5adbe118dc"><div class="sl-block-content" style="z-index: 18;"><img style="" data-natural-width="1449" data-natural-height="306" data-lazy-loaded="" data-src="prefixsumverification/461cdfaa94f682e5cb73ee0dbb3e7950.png"></div></div></section></section><section class="stack" data-id="34dac7169067610a587c1156dde8b220"><section data-id="fa88ac76fe754b1c7f0ec7629c1041f0" data-background-color="#ffffff"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="6b6ce30afedaa2d5293a288912c53b1b"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="4bed9f5dabdb5db814cae4ad4b5e43b4"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="e125ce1731df580c9ea411812670b9c3"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="min-width: 30px; min-height: 30px; width: 1216px; height: 503px; left: 33px; top: 181px;" data-block-id="70cf7fd982389b55a5b8c566c3308591"><div class="sl-block-content" style="z-index: 14; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>
+class Ref {
+	invariant N==16 &amp;&amp; H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant \matrix(tree,H,N*2);
+	invariant \array(input,N*2);
+	invariant \array(output,N*2);
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2; Perm(input[i], read));
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2; Perm(output[i], write));
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2;
+		(\forall* int j; 0&lt;=j &amp;&amp; j&lt;H; Perm(tree[j][i], write))
+	);
+	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
+...</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 103px; top: 151px; height: auto;" data-block-id="d4ade7ed9df05d17049d94c11c8d2a43"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Kernel declaration</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="6b27f8f95c84b3902ff8cb9936ede7f6"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="5e50d056db1e123c5b8f54cb51e6db07"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="6b6b48f0a3f4a68e176c5438f92abfcc"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="4aeebee1d1f35e63bde2cc313d5a8229"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1216px; height: 474px; left: 22px; top: 222px;" data-block-id="4c396a67f742488b1eac8b5ba6344826"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
+		par runThreads (int t=0..N)
+			context Perm(input[t], read);
+			context Perm(input[t+N], read);
+
+			context Perm(output[t], write);
+			context Perm(output[t+N], write);
+
+			context (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+		{
+	                ...
+		}
+	}</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="cf57a96b4883bd5aeb24d4c2fcabe802"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Threads</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="0fdcc45928f8dc11825207213549beea"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="f76a7133baaa786a3e0a04ffcadcd775"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="01efe97d0f6d9d09815539c5bbc6b761"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="8ee9e91abbf8fe5c00f47dc5b743328e"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1430px; height: 201px; left: -171px; top: 267px;" data-block-id="483376da8f857671e779333f69557fb4"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			tree[0][t] = input[t];
+			tree[0][t+N] = input[t+N];</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="b97296c6ddb7eedfbd9a4a5072e5ff7c"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Input copy</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="7e2752833ff9209c14187704a8a1a1a9"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="ff7ac68d4f1ea434a979f43ab16e8865"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="35c3df3a4977c19cf81fc6a3e4214fb8"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="ace8a80899ad61a7da1e973328e9c1c3"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1430px; height: 564px; left: -176px; top: 245px;" data-block-id="2bf2ce2467951dd1db61d8872d5a9687"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			int level=0;
+			loop_invariant level&gt;=0 &amp;&amp; level&lt;H;
+			loop_invariant t&gt;=0 &amp;&amp; t&lt;N;
+			// Old permisison layout going away, top row excluded: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; level&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;level; Perm(tree[i][t*2+k], write))
+			);
+			while((level+1)&lt;H) {
+                            ...
+			}
+</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="cc090ba910dfb843b82e734ffd0ba187"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Upsweep loop specification</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="ac61e90e95937deb4934402d012be344"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="328b9901b2c1d36bac6da10f6fcc2f23"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="7277b7dd9f54191e072a48f2f14edd45"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="6f4134d7df35c381e20240a2537f0341"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1446px; height: 564px; left: -185px; top: 216px;" data-block-id="17b39b4480a072ad0a10f5a610a47a25"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			while((level+1)&lt;H) {
+				level = level+1;
+				barrier(runThreads) {
+					context t&gt;=0 &amp;&amp; t&lt;N;
+					context level&gt;=1 &amp;&amp; level&lt;H;
+
+					requires Perm(tree[level-1][t], write);
+					requires Perm(tree[level-1][t+N], write);
+
+					ensures (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2; Perm(tree[level-1][t*2+k], write));
+				}
+				tree[level][t] = tree[level-1][t*2] + tree[level-1][t*2+1];
+			}</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="79379c99b530e8a79c9aee5410bcf3a8"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Upsweep loop barrier</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="476a15c8858621d4da64b1e56347ce1c"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="b2e3ce68f0ae52db0d158a45e02528ed"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="bb542fc6113b5ba172fae58f39481c6a"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="e5055422e4cc881e89b3976414595936"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1446px; height: 462px; left: -184px; top: 229px;" data-block-id="757c84b418038421627a4bc13d57cfcb"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			tree[H-1][t] = 0; // Set the root of the tree to zero
+
+			loop_invariant level&gt;=0 &amp;&amp; level&lt;H;
+			loop_invariant t&gt;=0 &amp;&amp; t&lt;N;
+			// Old permission layout coming back, top row already has it: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; level&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout going away, bottom row excluded: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;level; Perm(tree[i][t*2+k], write))
+			);
+			while(level&gt;0) {
+				   ...
+			}</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="2ff7a62482646120cf484e4b437c6cb2"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Downseep loop specifications</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="e5e50afdab06621a88548522d4f1b14d"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="db7696a435a4382021cdb8b3985538c4"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="a25fc16250b9ca30399bcf8390b62b08"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="d7374e5a76d04d386d1b874fe7a9e528"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1446px; height: 515px; left: -175px; top: 197px;" data-block-id="f60b03cb3064a573b672c18454e6b7ae"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			while(level&gt;0) {
+				tree[level-1][t*2+1] = tree[level-1][t*2] + tree[level][t];     // Right child
+				tree[level-1][t*2] = tree[level][t];                            // Left child
+
+				level = level-1;
+
+				barrier(runThreads) {
+					context t&gt;=0 &amp;&amp; t&lt;N;
+					context level&gt;=0 &amp;&amp; level&lt;H;
+
+					requires Perm(tree[level][t*2], write);
+					requires Perm(tree[level][t*2+1], write);
+
+					ensures Perm(tree[level][t], write);
+					ensures Perm(tree[level][t+N], write);
+				}
+			}</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="ad09ffd8fdf83647e288b12e3877cdd4"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Downsweep loop barrier</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="57911321d80fae4d7e367f96b6a4134b"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="13f06f1001c510f25402a34073e55240"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="6eec69ed7028785bc9a2fbc89de63fa9"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="8486a9b56ed2090f0b65e0765b9fa5b7"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1201px; height: 306px; left: 8px; top: 242px;" data-block-id="49fbead76367ae71534f19c9c40d66f5"><div class="sl-block-content" style="z-index: 13; font-size: 140%;" data-highlight-theme="xcode"><pre class="cpp"><code>			output[t] = tree[0][t];
+			output[t+N] = tree[0][t+N];</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="78cc45fe23431e3919d7cd94d4421f89"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Output copy</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="82e7ce49e6146089a09a9d5246ce11fd"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="d76063e130b71d7a5e8a141b595184b8"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Permissions</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="e1ad76a66be097b634cbe8896e1f4f97"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="fe55de8fb48c718cab26f9364ecc47e9"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1280px; height: 691px; left: 0px; top: 144px;" data-block-id="55971784c3bc520dff0b115297616b2a"><div class="sl-block-content" style="z-index: 13; font-size: 119%;" data-highlight-theme="xcode"><pre class="cpp"><code>
+class Ref {
+	// KERNEL
+	invariant N==16 &amp;&amp; H==6; // H = log(N)/log(2) + 2, N should be a power of 2
+	invariant \matrix(tree,H,N*2);
+	invariant \array(input,N*2);
+	invariant \array(output,N*2);
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2; Perm(input[i], read));
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2; Perm(output[i], write));
+	context (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2;
+		(\forall* int j; 0&lt;=j &amp;&amp; j&lt;H; Perm(tree[j][i], write))
+	);
+	void runKernel(int N, int H, int[N*2] input, int[N*2] output, int[H][N*2] tree) {
+
+		////////// THREADS
+		par runThreads (int t=0..N)
+			context Perm(input[t], read);
+			context Perm(input[t+N], read);
+
+			context Perm(output[t], write);
+			context Perm(output[t+N], write);
+
+			context (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+		{
+			////////// INPUT COPY
+			tree[0][t] = input[t];
+			tree[0][t+N] = input[t+N];
+
+			////////// UPSWEEP
+			int level=0;
+			loop_invariant level&gt;=0 &amp;&amp; level&lt;H;
+			loop_invariant t&gt;=0 &amp;&amp; t&lt;N;
+			// Old permisison layout going away, top row excluded: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; level&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout appearing, lowest row already has it: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;level; Perm(tree[i][t*2+k], write))
+			);
+			while((level+1)&lt;H) {
+				level = level+1;
+				barrier(runThreads) {
+					context t&gt;=0 &amp;&amp; t&lt;N;
+					context level&gt;=1 &amp;&amp; level&lt;H;
+
+					requires Perm(tree[level-1][t], write);
+					requires Perm(tree[level-1][t+N], write);
+
+					ensures (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2; Perm(tree[level-1][t*2+k], write));
+				}
+				tree[level][t] = tree[level-1][t*2] + tree[level-1][t*2+1];
+			}
+
+			////////// DOWNSWEEP
+			tree[H-1][t] = 0; // Set the root of the tree to zero
+
+			loop_invariant level&gt;=0 &amp;&amp; level&lt;H;
+			loop_invariant t&gt;=0 &amp;&amp; t&lt;N;
+			// Old permission layout coming back, top row already has it: (t1 | t2 | t3 | t4 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; level&lt;=i &amp;&amp; i&lt;H; Perm(tree[i][k*N+t], write))
+			);
+			// New permission layout going away, bottom row excluded: (t1 | t1 | t2 | t2 | ...)
+			loop_invariant (\forall* int k; 0&lt;=k &amp;&amp; k&lt;2;
+				(\forall* int i; 0&lt;=i &amp;&amp; i&lt;level; Perm(tree[i][t*2+k], write))
+			);
+			while(level&gt;0) {
+				// Do next down-sweep step
+				tree[level-1][t*2+1] = tree[level-1][t*2] + tree[level][t];     // Right child
+				tree[level-1][t*2] = tree[level][t];                            // Left child
+
+				level = level-1;
+
+				barrier(runThreads) {
+					context t&gt;=0 &amp;&amp; t&lt;N;
+					context level&gt;=0 &amp;&amp; level&lt;H;
+
+					requires Perm(tree[level][t*2], write);
+					requires Perm(tree[level][t*2+1], write);
+
+					ensures Perm(tree[level][t], write);
+					ensures Perm(tree[level][t+N], write);
+				}
+			}
+
+			////////// OUTPUT COPY
+			output[t] = tree[0][t];
+			output[t+N] = tree[0][t+N];
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</code></pre></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="d537b90095aa3dd646e2c47153d48e03"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Complete</h2>
+</div></div></section></section><section class="stack" data-id="c502e494ab5e6890c2155b3943bf9e87"><section data-background-color="#ffffff" data-id="b4ff3f49e6d52bbed42b81286c2b2e40"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="eda86dfc7cf141562a1618425885bf05"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="c6f492bfdd9e78e6242e0cfb11dd3a47"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="7ba7ad623c6aaa1af90e4fe4e10589b2"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="60082ccc28acbe9cf2f9349c3c844d4e"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 14; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>End goal</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="min-width: 30px; min-height: 30px; width: 769px; height: 190px; left: 278px; top: 303px;" data-block-id="6efaeebaf363ebb9c00485f1dd327312"><div class="sl-block-content" style="z-index: 15; font-size: 200%;" data-highlight-theme="xcode"><pre class="cpp"><code>ensures (
+    \forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2;
+        output[i] == \sum([0 ..i), input)
+);</code></pre></div></div></section><section data-background-color="#ffffff" data-id="522c1bed922a83d4583052ff100882b9"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="b503522e529143c8d937e68db7b3e65f"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="eddcd74dabe0320a366539ce88bd8246"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="bd60a219aa4bad8838fa2f390aca253a"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" data-block-id="86923d7e5d066c10a0f9a4c6b69ac3c9" style="height: auto; min-width: 30px; min-height: 30px; width: 1038px; left: 140px; top: 257px;"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 13; font-size: 147%; text-align: left;">
+<ol>
+	<li>Bottom row contains the input</li>
+	<li>Updated partial sums for each upsweep step</li>
+	<li>The highest row is zero</li>
+	<li>Updated partial sums for each downsweep step</li>
+	<li>Output array contains prefix sums</li>
+</ol>
+</div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="266609b5d1524ebce6d734c2c9f09391"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 15; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Steps</h2>
+</div></div></section><section data-background-color="#ffffff" data-id="3a8484344b5ce074f840ca0a1f2bbb72"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="5746ca69459e4653fcc12ed03c5f3135"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="3b805093c0e91263a8b3e9f1323c9144"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="8a73c72ebeb1355629c52311f4ce85ef"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="3b8a4df043d4fc43850ea2217ca34a44"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Step 1: bottom row</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="min-width: 30px; min-height: 30px; width: 981px; height: 71px; left: 160px; top: 325px;" data-block-id="cef3e98ec8c6aeef652e09231640a537"><div class="sl-block-content" style="z-index: 15; font-size: 185%;" data-highlight-theme="xcode"><pre class="cpp"><code>loop_invariant (\forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2; tree[0][i] == input[i]);</code></pre></div></div></section><section data-background-color="#ffffff" data-id="557934ea9cc3fe4a7afa9874d63b3bd4"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="b23699cc2a88a384ff296fff3f216f61"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="bff2fe71dff8169e8c34a5af642d05a6"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="941d8042701d685dccebbba1cc48d613"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="bb8ef6e160d72ce10a0fd7efd3c3d9ec"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Step 2: upsweep</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="width: 1106px; height: 134px; left: 80px; top: 288px;" data-block-id="cc67b2accaee2053e9f8d1e2bb7fc5e0"><div class="sl-block-content" style="z-index: 14; font-size: 185%;" data-highlight-theme="xcode"><pre class="cpp"><code>loop_invariant level&gt;0 ==&gt; tree[level][t] == tree[level-1][t*2] +
+    tree[level-1][t*2+1];</code></pre></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1106px; height: 134px; left: 87px; top: 485px;" data-block-id="bb1dbaea47bcd3135cd38b72f2e675bc"><div class="sl-block-content" style="z-index: 16; font-size: 185%;" data-highlight-theme="xcode"><pre class="cpp"><code>((t+1)*2^level &lt; N*2) =&gt; tree[level][t] == 
+    \sum([t*2^level..(t+1)*2^level), tree[0]);</code></pre></div></div></section><section data-background-color="#ffffff" data-id="9efab19fbbf62bf866202a2f16805e6b"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="52ab77912da59efcc483150175304e5a"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="0ba98c3eeaa6aeb881c7baaea29e7194"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="141daf2ad967a7fd7c05891860e95fd8"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="51e2c0bbc5b3adc0b2b9f75c91f6924e"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Step 3: root to zero</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="width: 633px; height: 85px; left: 310px; top: 318px;" data-block-id="f9de91805bba6f1d40d64d2717c91911"><div class="sl-block-content" style="z-index: 14; font-size: 203%;" data-highlight-theme="xcode"><pre class="cpp"><code>loop_invariant tree[H-1][t] == 0;</code></pre></div></div></section><section data-background-color="#ffffff" data-id="e08608ade9514e62f8cf57df20e66275"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="d182649569c94fe909d3a1c93af1425d"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="5dfb67636c81e3fd9d12041a6852a5fb"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="edfa68e9bdeb0eb8812d837c0b638912"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="4da67d01a961c5e8a9c16b022654ae84"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Step 4: downsweep</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="width: 826px; height: 170px; left: 169px; top: 239px;" data-block-id="dc347f1696949cb0c5852f10a2e016e6"><div class="sl-block-content" style="z-index: 14; font-size: 173%;" data-highlight-theme="xcode"><pre class="cpp"><code>loop_invariant tree[level-1][t*2+1] == 
+        \old(tree[level-1][t*2]) +
+        tree[level][t];
+loop_invariant tree[level-1][t*2] == tree[level][t];</code></pre></div></div>
+<div class="sl-block" data-block-type="code" style="width: 1009px; height: 179px; left: 169px; top: 445px;" data-block-id="624f15754c1e8a18895ed7057fa2e9b7"><div class="sl-block-content" style="z-index: 16; font-size: 173%;" data-highlight-theme="xcode"><pre class="cpp"><code>loop_invariant (t*2^(level-1) &lt; N*2) =&gt; tree[level-1][t*2] == 
+    \sum([0..t*2^(level-1)], tree[0]);
+loop_invariant (t*2^(level-1) &lt; N*2) =&gt; tree[level-1][t*2+1] == 
+    \sum([0..t*2^(level-1)+1], tree[0]);</code></pre></div></div></section><section data-background-color="#ffffff" data-id="61a2688193ea0d50e2448cc2bc6fc198"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="a9f58a0e2cfb0a1d73a0558c45479d45"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 12; color: rgb(255, 255, 255);">
+<h2>Specification: Functionality</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="5510e62faaa37b81fe2fa9972c9c0fbb"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="928737b66c76a3c9fef015e326dd1000"><div class="sl-block-style" style="z-index: 10;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 10;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 151px; height: auto;" data-block-id="3fad8c206691258ab15776e322e2d5a0"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(2, 169, 38); font-size: 63%;">
+<h2>Step 5: End goal</h2>
+</div></div>
+<div class="sl-block" data-block-type="code" style="min-width: 30px; min-height: 30px; width: 769px; height: 190px; left: 256px; top: 465px;" data-block-id="334b032c2d8c26d738d14a7097668b1d"><div class="sl-block-content" style="z-index: 14; font-size: 200%;" data-highlight-theme="xcode"><pre class="cpp"><code>ensures (
+    \forall* int i; 0&lt;=i &amp;&amp; i&lt;N*2;
+        output[i] == \sum([0 ..i), input)
+);</code></pre></div></div>
+<div class="sl-block" data-block-type="code" style="min-width: 30px; min-height: 30px; width: 769px; height: 110px; left: 256px; top: 278px;" data-block-id="ce01a2151a2f8b334ffe0ed3b34cfb9a"><div class="sl-block-content" style="z-index: 16; font-size: 200%;" data-highlight-theme="xcode"><pre class="cpp"><code>output[t] == \sum([0 ..t), input);
+output[t+N] == \sum([0 ..t+N), input);
+</code></pre></div></div></section></section><section data-id="6f4a957ea719de393ea08921485cee06"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="29c020df2e9b28319cb36f5aee19fcfe"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>VerCors Performance</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="28fa0888cabb9389911ed51d15eda780"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="0cd36b49d4c8211ad3bc700092761d45"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="image" style="min-width: 30px; min-height: 30px; width: 1112px; height: 285px; left: 85px; top: 240px;" data-block-id="ea0d01ac3b20d4cb2be4a69c9e5f8c97"><div class="sl-block-content" style="z-index: 14;"><img style="" data-natural-width="1394" data-natural-height="357" data-lazy-loaded="" data-src="prefixsumverification/1f3c392c660b2d9f38fe64c82fb66c3e.png"></div></div></section><section data-id="2c804a6e550c56b60d4c7d98f97f609d"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="90ad017968d5f038daac0116c4042860"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Results</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="e43f6b9dae1eb138e3d910e5cba000f2"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="149186a2a929bcbf1c3da7ec1c75fc76"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 814px; left: 226px; top: 216px;" data-block-id="74d204a842069d7cc08b351dde9b5bc0"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; text-align: left; font-size: 201%;">
+<ul>
+	<li>Permissions verified</li>
+	<li>\context</li>
+	<li>\invariant</li>
+	<li>VerCors performance</li>
+	<li>VerCors consistency</li>
+</ul>
+</div></div></section><section data-id="e568f2ea35f18eb50aaa432895c0636c"><div class="sl-block" data-block-type="text" style="width: 1076px; left: 102px; top: 43px; height: auto;" data-block-id="fedba5d8140cee7849e4905accb2afad"><div class="sl-block-content" data-placeholder-tag="h2" data-placeholder-text="Title Text" style="z-index: 13; color: rgb(255, 255, 255);">
+<h2>Future work</h2>
+</div></div>
+<div class="sl-block" data-block-type="shape" style="width: 1280px; height: 144px; left: 0px; top: 0px;" data-block-id="9193c847acd8cf648a7470abeb492326"><div class="sl-block-style" style="z-index: 12;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 12;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1280 144"><rect width="1280" height="144" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+
+
+<div class="sl-block" data-block-type="shape" style="width: 1852px; height: 208px; left: -285px; top: -64px;" data-block-id="1e78c0e85f3611995f71b371bfb312ac"><div class="sl-block-style" style="z-index: 11;"><div class="sl-block-content" data-shape-type="rect" data-shape-fill-color="rgb(2, 169, 38)" data-shape-stretch="true" style="z-index: 11;" href=""><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" preserveaspectratio="none" viewbox="0 0 1852 208"><rect width="1852" height="208" class="shape-element" fill="rgb(2, 169, 38)"></rect></svg></div></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 940px; left: 139px; top: 246px;" data-block-id="65c290bda9acb1a7679082e7f3ad9fa2"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; text-align: left; font-size: 157%;">
+<ul>
+	<li>Functional specification and verification</li>
+	<li>Investigate performance:
+	<ul>
+		<li><span style="font-size:0.7em">Setup some simple benchmarks</span></li>
+		<li><span style="font-size:0.7em">Track times for each commit</span></li>
+	</ul>
+	</li>
+</ul>
+</div></div></section>
+			</div>
+		</div>
+
+		<script>
+			var SLConfig = {"deck": {"id":1168753,"slug":"prefixsumverification","title":"Parallel Prefix Sum Verification with VerCors","description":"Parallel Prefix Sum Verification with VerCors","width":1280,"height":720,"visibility":"all","published_at":"2018-02-08T10:37:57.554Z","sanitize_messages":null,"thumbnail_url":"https://s3.amazonaws.com/media-p.slid.es/thumbnails/6e38894ee8baf360b8424ddbf751f8c4/thumb.jpg?1517838854","view_count":0,"user":{"id":825548,"username":"thijswiefferink","name":null,"description":null,"thumbnail_url":"https://www.gravatar.com/avatar/19e9023b8b431b43b5d36c8ac8ed0846?s=140\u0026d=https%3A%2F%2Fs3.amazonaws.com%2Fstatic.slid.es%2Fimages%2Fdefault-profile-picture.png","paid":true,"pro":false,"lite":true,"team_id":null,"settings":{"id":688483,"present_controls":true,"present_upsizing":true,"present_pointer":false,"present_notes":true,"default_deck_tag_id":null}},"background_transition":"slide","transition":"slide","theme_id":null,"theme_font":"merriweather","theme_color":"silver-green","auto_slide_interval":0,"comments_enabled":false,"forking_enabled":false,"rolling_links":false,"center":false,"should_loop":false,"share_notes":false,"slide_number":false,"slide_count":44,"rtl":false,"version":2,"collaborative":null,"deck_user_editor_limit":1,"data_updated_at":1518092963177,"font_typekit":null,"font_google":null,"notes":{"d8002923c85feb3a3b18b0a4d68d82c4":"- Input sequence of numbers\n- Output sequence of numbers with the length\n- Output has sums of all inputs with lower index\n- Usage: quicksort, radixsort, lexically comparing string","33cd5cbd07f100cf84535141db7d6216":"Sequential addition\nTakes time of order N\nCannot be sped up with parallism, as GPUs can do","806bbc287ba861d4e5285a211410c00b":"- Parallel algorithm\n- Balanced binary tree\n- Made by Blelloch\n- Two phases: upsweep, downsweep\n- Input at bottom row","782597e2a8bff15e55e030f93914e6a5":"- Adding inputs for partial sums\n- Each branch by different thread\n- Synchronize between rows","b89621b25292231652c9081ce4f0f47a":"- Same additions\n- Half of the threads used","2921ba76083c13c5a5349e65b2c7a8d2":"- Same thing\n- Sum of all inputs at the top\n- Partial sums at tree nodes","b9d0f5dd903a9556f668a00400c3afe6":"- Root to zero\n- Right = parent+left\n- Left = parent","fa868908144cfd6d14b5a778ab46b2a0":"- Same thing\n- Explain","2123706c73a3a5674dbbe98cdec42e26":"- Builds on Bachelor\n- Verification of a GPU program\n- Presentation: showed two images of planes\n- Nowadays: launching rockets","4aec302b898e34e49ef06470b8a3c8a8":"- Planes work differently: Fly-by-wire\n- Electronic signal from joystick to computer\n- Verification is important\n- ","dcffa2b75d38e018d25931e204bc4630":"- Two-dimensional array: performance\n- Array of N x log2(N)+1\n- Partially useful values\n- Number of threads = N/2\n- Thread permissions\n- Input copied from an input array\n- Not ready for first upsweep","729c41b1b794d4ec137518938439309d":"- First downsweep, then barrier","94240aba8ddc528df463300db1871b4a":"- First barrier, then upsweep","ef8d2a98cacdd1961b02e91f43c46eb9":"- 2 threads do a useless calculation","728eba44ad6907fe8043fcac31733616":"- Same permissions as at the start","c1abd936b3059b0c5b1bb8c32a212ffc":"- Same permissions as input array\n- Same permissions as bottom of tree array","fa88ac76fe754b1c7f0ec7629c1041f0":"KERNEL:\n- Why constants? N \u0026 H\n- \\matrix\n- \\array\n- context\n- Using one nested \\forall VS two \\foralls\n\nTHREADS:\n- Thread permissions\n- Input copy\n\nUPSWEEP:\n- loop invariants\n- barrier: permission exchange\n\nDOWNSWEEP:\n- root to zero\n- barrier: permissions exchange","6f4a957ea719de393ea08921485cee06":"- Time increases with complexity\n- Multiple cores\n- Caching?\n- Loop body as method (Stefan)\n- Underlying libraries: Z3\n\n- 32 minutes\n- 36 minutes"}}};
+
+
+			// Use local fonts
+			SLConfig.fonts_url = 'lib/fonts/';
+		</script>
+
+		<script src="lib/head.min.js"></script>
+		<script src="lib/reveal.min.js"></script>
+		<script src="lib/offline.js"></script>
+
+		<!-- Initialize the presentation -->
+		<script>
+			Reveal.initialize({
+				width: 1280,
+				height: 720,
+				margin: 0.05,
+
+				controls: true,
+				progress: true,
+				history: true,
+				mouseWheel: false,
+				showNotes: false,
+				slideNumber: false,
+
+				autoSlide: 0 || 0,
+				autoSlideStoppable: true,
+
+				center: false,
+				loop: false,
+				rtl: false,
+
+				transition: "slide",
+				backgroundTransition: "slide",
+
+				dependencies: [
+					{ src: 'lib/reveal-plugins/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/reveal-plugins/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/reveal-plugins/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); } },
+					{ src: 'lib/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+		</script>
+
+		
+
+	</body>
+</html>
